@@ -7,6 +7,10 @@
 // YOUR_EMAIL_GOES_HERE
 
 
+import java.io.*;
+import java.net.InetAddress;
+import java.net.Socket;
+
 // DO NOT EDIT starts
 interface TemporaryNodeInterface {
     public boolean start(String startingNodeName, String startingNodeAddress);
@@ -17,9 +21,31 @@ interface TemporaryNodeInterface {
 
 
 public class TemporaryNode implements TemporaryNodeInterface {
-
+    Writer send;
+    BufferedReader recieve;
+    Socket socket;
     public boolean start(String startingNodeName, String startingNodeAddress) {
-	// Implement this!
+        System.out.println("TCPClient connecting to " +  startingNodeAddress);
+        String[] addrs = startingNodeAddress.split(":");
+        try {
+           socket = new Socket(addrs[0],Integer.parseInt(addrs[1]));
+           recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+           send = new OutputStreamWriter(socket.getOutputStream());
+           send.write("START 1" + startingNodeName + "\n");
+           send.flush();
+           String msg = recieve.readLine();
+           if(!msg.contains("START")){
+               socket.close();
+               return false;
+           }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+
+
+        // Implement this!
 	// Return true if the 2D#4 network can be contacted
 	// Return false if the 2D#4 network can't be contacted
 	return true;

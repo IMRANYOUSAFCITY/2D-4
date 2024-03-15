@@ -31,10 +31,12 @@ public class TemporaryNode implements TemporaryNodeInterface {
            socket = new Socket(addrs[0],Integer.parseInt(addrs[1]));
            recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
            send = new OutputStreamWriter(socket.getOutputStream());
-           send.write("START 1" + startingNodeName + "\n");
+           send.write("START 1" + startingNodeName);
            send.flush();
            String msg = recieve.readLine();
-           if(!msg.contains("START")){
+           if(!msg.startsWith("START")){
+               send.close();
+               recieve.close();
                socket.close();
                return false;
            }
@@ -42,8 +44,6 @@ public class TemporaryNode implements TemporaryNodeInterface {
             System.out.println(e.getMessage());
             return false;
         }
-
-
 
         // Implement this!
 	// Return true if the 2D#4 network can be contacted

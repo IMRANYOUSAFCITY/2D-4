@@ -8,14 +8,14 @@
 
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Objects;
 
 // DO NOT EDIT starts
 interface TemporaryNodeInterface {
-    public boolean start(String startingNodeName, String startingNodeAddress);
-    public boolean store(String key, String value);
-    public String get(String key);
+    boolean start(String startingNodeName, String startingNodeAddress);
+    boolean store(String key, String value);
+    String get(String key);
 }
 // DO NOT EDIT ends
 
@@ -31,7 +31,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
            socket = new Socket(addrs[0],Integer.parseInt(addrs[1]));
            recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
            send = new OutputStreamWriter(socket.getOutputStream());
-           send.write("START 1" + startingNodeName);
+           send.write("START 1 " + startingNodeName);
            send.flush();
            String msg = recieve.readLine();
            if(!msg.startsWith("START")){
@@ -44,24 +44,51 @@ public class TemporaryNode implements TemporaryNodeInterface {
             System.out.println(e.getMessage());
             return false;
         }
-
-        // Implement this!
-	// Return true if the 2D#4 network can be contacted
-	// Return false if the 2D#4 network can't be contacted
 	return true;
     }
 
     public boolean store(String key, String value) {
-	// Implement this!
-	// Return true if the store worked
-	// Return false if the store failed
-	return true;
+        try {
+            String[] keys = key.split(" ");
+            String[] values = value.split(" ");
+            if(keys.length < 1 || values.length < 1){
+                return false;
+            }
+            send.write("PUT? " + keys.length + " " + values.length + "\n");
+            for(String s : keys){
+                send.write(s + "\n");
+            }
+            for(String s : values){
+                send.write(s + "\n");
+            }
+            send.flush();
+            String response = recieve.readLine();
+            return Objects.equals(response, "SUCCESS");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
     }
 
     public String get(String key) {
-	// Implement this!
-	// Return the string if the get worked
-	// Return null if it didn't
-	return "Not implemented";
+        try {
+            String[] keys = key.split(" ");
+            if(keys.length < 1){
+                return null;
+            }
+            send.write("GET? " + keys.length + "\n");
+            for(String s : keys){
+                send.write(s + "\n");
+            }
+            send.flush();
+            String response = recieve.readLine();
+            if(Objects.equals(response, "NOPE")){
+                return null;
+            }
+            return response;
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 }

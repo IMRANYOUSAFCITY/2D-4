@@ -9,6 +9,7 @@
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Objects;
 
 // DO NOT EDIT starts
@@ -31,7 +32,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
            socket = new Socket(addrs[0],Integer.parseInt(addrs[1]));
            recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
            send = new OutputStreamWriter(socket.getOutputStream());
-           send.write("START 1 " + startingNodeName);
+           send.write("START 1 " + 1 + startingNodeName);
            send.flush();
            String msg = recieve.readLine();
            if(!msg.startsWith("START")){
@@ -85,8 +86,20 @@ public class TemporaryNode implements TemporaryNodeInterface {
             if(Objects.equals(response, "NOPE")){
                 return null;
             }
-            return response;
+            String value = recieve.readLine();
+            return value;
         } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    public String nearest(String key){
+        try {
+            send.write("NEAREST? " + Arrays.toString(new HashID().computeHashID(key)) + "\n");
+            send.flush();
+            recieve.readLine();
+            return recieve.readLine();
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }

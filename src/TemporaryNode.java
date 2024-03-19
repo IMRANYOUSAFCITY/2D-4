@@ -32,7 +32,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
            socket = new Socket(addrs[0],Integer.parseInt(addrs[1]));
            recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
            send = new OutputStreamWriter(socket.getOutputStream());
-           send.write("START 1 " + 1 + startingNodeName);
+           send.write("START 1 " + 1 + startingNodeName + "\n");
            send.flush();
            String msg = recieve.readLine();
            if(!msg.startsWith("START")){
@@ -52,21 +52,22 @@ public class TemporaryNode implements TemporaryNodeInterface {
         try {
             String[] keys = key.split(" ");
             String[] values = value.split(" ");
-            if(keys.length < 1 || values.length < 1){
-                return false;
-            }
             send.write("PUT? " + keys.length + " " + values.length + "\n");
+            System.out.println("PUT? " + keys.length + " " + values.length);
             for(String s : keys){
+                System.out.println(s);
                 send.write(s + "\n");
             }
             for(String s : values){
+                System.out.println(s);
                 send.write(s + "\n");
             }
             send.flush();
-            String response = recieve.readLine();
+            String response = recieve.readLine();//ERROR HERE
+            System.out.println(response);
             return Objects.equals(response, "SUCCESS");
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.out.println("error in temp");
             return false;
         }
     }
@@ -74,7 +75,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
     public String get(String key) {
         try {
             String[] keys = key.split(" ");
-            if(keys.length < 1){
+            if(keys.length == 0){
                 return null;
             }
             send.write("GET? " + keys.length + "\n");
@@ -102,6 +103,16 @@ public class TemporaryNode implements TemporaryNodeInterface {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
+        }
+    }
+
+    public static void main(String[] args) {
+        TemporaryNode tn = new TemporaryNode();
+        if(tn.start("imranc@city.ac.uk","127.0.0.1:4567")){
+            System.out.println("connected");
+        }
+        if(tn.store("hello there","does it work?")){
+            System.out.println("it works");
         }
     }
 }

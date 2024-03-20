@@ -78,19 +78,27 @@ public class TemporaryNode implements TemporaryNodeInterface {
             if(keys.length == 0){
                 return null;
             }
-            send.write("GET? " + keys.length + "\n");
+            send.write("GET? " + keys.length + "" +"\n");
+            System.out.println("GET? " + keys.length);
             for(String s : keys){
                 send.write(s + "\n");
+                System.out.println(s);
             }
             send.flush();
-            String response = recieve.readLine();
-            if(Objects.equals(response, "NOPE")){
-                return null;
+            String[] responses = recieve.readLine().split(" "); // ERROR HERE
+            System.out.println(responses[0] + " " + responses[1]);
+            if(Objects.equals(responses[0], "VALUE")){
+                String[] values = new String[Integer.parseInt(responses[1])];
+                for(int i = 0; i < Integer.parseInt(responses[1]); i++){
+                    values[i] = recieve.readLine();
+                    System.out.println(values[i]);
+                }
+                return String.join(" ",values);
             }
-            String value = recieve.readLine();
-            return value;
+            return null;
         } catch (IOException e) {
             System.out.println(e.getMessage());
+            System.out.println("ERROR in temp node");
             return null;
         }
     }
@@ -111,8 +119,9 @@ public class TemporaryNode implements TemporaryNodeInterface {
         if(tn.start("imranc@city.ac.uk","127.0.0.1:4567")){
             System.out.println("connected");
         }
-        if(tn.store("hello there","does it work?")){
-            System.out.println("it works");
-        }
+       // if(tn.store("hello there","does it work?")){
+        //    System.out.println("it works");
+        //}
+        tn.get("hello there");
     }
 }

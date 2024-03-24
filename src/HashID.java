@@ -62,7 +62,7 @@ public class HashID {
 
 	public static void main(String[] args) throws Exception {
 		String s1 = "Hello World!";
-		String s2 = "hello";
+		String s2 = "test/jabberwocky/1";
 		System.out.println(HashID.computeHashID(s1 + "\n"));
 		System.out.println(HashID.byteToHex(HashID.computeHashID(s1 + "\n")));
 		System.out.println(HashID.byteToHex(HashID.computeHashID(s2 + "\n")));

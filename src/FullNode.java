@@ -121,9 +121,10 @@ public class FullNode implements FullNodeInterface {
 
     public static void main(String[] args) {
         FullNode f = new FullNode();
-        //f.keyValue.put("hello there","does it work?");
+        f.keyValue.put("hello there","does it work?");
         f.listen("127.0.0.1",4567);
         f.handleIncomingConnections("imranc@city.ac.uk","127.0.0.1:4567");
     }
+    //test
 }
 

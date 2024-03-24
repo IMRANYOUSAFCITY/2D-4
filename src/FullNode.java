@@ -10,7 +10,9 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 // DO NOT EDIT starts
 interface FullNodeInterface {
@@ -21,6 +23,10 @@ interface FullNodeInterface {
 
 
 public class FullNode implements FullNodeInterface {
+    String name;
+    String address;
+    HashMap<Integer, ArrayList<String>> networkMap = new HashMap<>();
+
     HashMap<String, String> keyValue = new HashMap<String, String>();
     ServerSocket serverSocket;
     Socket clientSocket;
@@ -47,13 +53,18 @@ public class FullNode implements FullNodeInterface {
     public void handleIncomingConnections(String startingNodeName, String startingNodeAddress) {
         try {
             if (!start) {
+                name = startingNodeName;
+                address = startingNodeAddress;
                 clientSocket = serverSocket.accept();
+                String node = String.join(" ",startingNodeName,startingNodeAddress);
+                networkMap.put(0,new ArrayList<String>());
+                networkMap.get(0).add(String.join(" ",name,address));
                 recieve = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 String msg = recieve.readLine();
                 if(msg.startsWith("START")) {
                     send = new OutputStreamWriter(clientSocket.getOutputStream());
-                    send.write("START " + 1 + startingNodeName + "\n");
-                    System.out.println("START " + 1 + startingNodeName);
+                    send.write("START " + 1 + name + "\n");
+                    System.out.println("START " + 1 + name);
                     send.flush();
                     System.out.println("node connected");
                     start = true;
@@ -64,16 +75,17 @@ public class FullNode implements FullNodeInterface {
             String msg = recieve.readLine();
             if(msg.startsWith("PUT?")){
                 String[] s = msg.split(" ");
-                String key = "";
-                String value = "";
+                String[] keys = new String[Integer.parseInt(s[1])];
+                String[] values = new String[Integer.parseInt(s[2])];;
                 for(int x = 0; x < Integer.parseInt(s[1]); x++){
-                    key += recieve.readLine() + " ";
+                    keys[x] = recieve.readLine();
                 }
                 for(int x = 0; x < Integer.parseInt(s[2]); x++){
-                    value += recieve.readLine() + " ";
+                    values[x] = recieve.readLine();
                 }
-                //byte[] k = new HashID().computeHashID(key+"\n");
-                //byte[] v = new HashID().computeHashID(value+"\n");
+                String key = String.join(" ",keys);
+                String value = String.join(" ",values);
+                //int distance = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(key)))
                 keyValue.put(key,value);
                 send.write("SUCCESS" + "\n");
                 send.flush();
@@ -91,6 +103,12 @@ public class FullNode implements FullNodeInterface {
                     send.write(v + "\n");
                 }
                 send.flush();
+            } else if (msg.startsWith("NOTIFY")) {
+                String n = recieve.readLine();
+                int x = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(name + "\n")),HashID.byteToHex(HashID.computeHashID(n + "\n")));
+                networkMap.put(x,new ArrayList<>());
+                networkMap.get(x).add(String.join(" ",n,recieve.readLine()));
+                send.write("NOTIFIED");
             }
 
         } catch(Exception e){
@@ -100,9 +118,10 @@ public class FullNode implements FullNodeInterface {
 	// Implement this!
     }
 
+
     public static void main(String[] args) {
         FullNode f = new FullNode();
-        f.keyValue.put("hello there","does it work?");
+        //f.keyValue.put("hello there","does it work?");
         f.listen("127.0.0.1",4567);
         f.handleIncomingConnections("imranc@city.ac.uk","127.0.0.1:4567");
     }

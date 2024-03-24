@@ -63,7 +63,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
                 send.write(s + "\n");
             }
             send.flush();
-            String response = recieve.readLine();//ERROR HERE
+            String response = recieve.readLine();
             System.out.println(response);
             return Objects.equals(response, "SUCCESS");
         } catch (IOException e) {
@@ -78,14 +78,14 @@ public class TemporaryNode implements TemporaryNodeInterface {
             if(keys.length == 0){
                 return null;
             }
-            send.write("GET? " + keys.length + "" +"\n");
+            send.write("GET? " + keys.length +"\n");
             System.out.println("GET? " + keys.length);
             for(String s : keys){
                 send.write(s + "\n");
                 System.out.println(s);
             }
             send.flush();
-            String[] responses = recieve.readLine().split(" "); // ERROR HERE
+            String[] responses = recieve.readLine().split(" ");
             System.out.println(responses[0] + " " + responses[1]);
             if(Objects.equals(responses[0], "VALUE")){
                 String[] values = new String[Integer.parseInt(responses[1])];
@@ -102,16 +102,12 @@ public class TemporaryNode implements TemporaryNodeInterface {
             return null;
         }
     }
-    public String nearest(String key){
-        try {
-            send.write("NEAREST? " + Arrays.toString(new HashID().computeHashID(key)) + "\n");
-            send.flush();
-            recieve.readLine();
-            return recieve.readLine();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return null;
+    public String nearest(String key) throws Exception {
+        send.write("NEAREST " + HashID.byteToHex(HashID.computeHashID(key)));
+        if(recieve.readLine().startsWith("NODES")){
+           return String.join(" ",recieve.readLine(),recieve.readLine());
         }
+        return null;
     }
 
     public static void main(String[] args) {
@@ -119,9 +115,9 @@ public class TemporaryNode implements TemporaryNodeInterface {
         if(tn.start("imranc@city.ac.uk","127.0.0.1:4567")){
             System.out.println("connected");
         }
-       // if(tn.store("hello there","does it work?")){
-        //    System.out.println("it works");
-        //}
-        tn.get("hello there");
+        if(tn.store("hello there","does it work?")){
+            System.out.println("it works");
+        }
+        //tn.get("hello there");
     }
 }

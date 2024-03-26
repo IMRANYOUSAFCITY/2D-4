@@ -57,14 +57,16 @@ public class FullNode implements FullNodeInterface {
             if(!start){
                 start();
             }
-            String msg = recieve.readLine();
-            if(msg.startsWith("PUT?")){
-                put(msg);
-            } else if(msg.startsWith("GET?")){
-                get(msg);
-            } else if (msg.startsWith("NOTIFY")) {
-                notify(msg);
-            }
+                String msg = recieve.readLine();
+                if (msg.startsWith("PUT?")) {
+                    put(msg);
+                } else if (msg.startsWith("GET?")) {
+                    get(msg);
+                } else if (msg.startsWith("NOTIFY")) {
+                    notify(msg);
+                } else if (msg.startsWith("NEAREST")) {
+
+                }
 
         } catch(Exception e){
             System.out.println("error in full node");
@@ -125,13 +127,19 @@ public class FullNode implements FullNodeInterface {
                 keys[x] = recieve.readLine();
             }
             String key = String.join(" ",keys);
-            String value = keyValue.get(key);//ERROR here
-            String[] values = value.split(" ");
-            send.write("VALUE " + values.length + "\n");
-            for(String v :values){
-                send.write(v + "\n");
+            String value = keyValue.get(key);
+            if(value == null){
+                send.write("NOPE" + "\n");
+                System.out.println("NOPE");
+                send.flush();
+            }else {
+                String[] values = value.split(" ");
+                send.write("VALUE " + values.length + "\n");
+                for (String v : values) {
+                    send.write(v + "\n");
+                }
+                send.flush();
             }
-            send.flush();
         }catch(Exception e){
             System.out.println("error in get");
             throw new RuntimeException(e);

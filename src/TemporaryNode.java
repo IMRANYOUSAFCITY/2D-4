@@ -73,6 +73,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public String get(String key) {
         try {
+            String[] node;
             int x = 0;
             while (x < 3) {
                     String[] keys = key.split(" ");
@@ -86,7 +87,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
                         System.out.println(s);
                     }
                     send.flush();
-                    String[] responses = recieve.readLine().split(" "); // Out of bound ERROR for 1
+                    String[] responses = recieve.readLine().split(" ");
                     System.out.println(responses[0]);
                     String[] addrs = new String[3];
                     if (Objects.equals(responses[0], "VALUE")) {
@@ -97,8 +98,8 @@ public class TemporaryNode implements TemporaryNodeInterface {
                         }
                         return String.join(" ", values);
                     } else if (Objects.equals(responses[0], "NOPE") && x == 0) {
-                        send.write("NEAREST? " + HashID.otherhash(key + "\n") + "\n");
-                        System.out.println(HashID.otherhash(key));
+                        send.write("NEAREST? " + HashID.otherhash(key + "\n"));
+                        System.out.println("NEAREST? " + HashID.otherhash(key + "\n"));
                         send.flush();
                         for (int i = 0; i < 3; i++) {
                             System.out.println(recieve.readLine());
@@ -106,10 +107,10 @@ public class TemporaryNode implements TemporaryNodeInterface {
                             System.out.println(addrs[i]);
                         }
                     }
-                    String[] node = addrs[x].split(":");
+                    node = addrs[x].split(":");
                     socket = new Socket(node[0],Integer.parseInt(node[1]));
                     recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    //send = new OutputStreamWriter(socket.getOutputStream());
+                    send =new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                     x++;    System.out.println(x);
             }
             return null;

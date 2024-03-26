@@ -22,7 +22,7 @@ interface TemporaryNodeInterface {
 
 
 public class TemporaryNode implements TemporaryNodeInterface {
-    Writer send;
+    BufferedWriter send;
     BufferedReader recieve;
     Socket socket;
     public boolean start(String startingNodeName, String startingNodeAddress) {
@@ -31,8 +31,8 @@ public class TemporaryNode implements TemporaryNodeInterface {
         try {
            socket = new Socket(addrs[0],Integer.parseInt(addrs[1]));
            recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-           send = new OutputStreamWriter(socket.getOutputStream());
-           send.write("START 1 " + 1 + startingNodeName + "\n");
+           send = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+           send.write("START 1 "  + startingNodeName + "\n");
            send.flush();
            String msg = recieve.readLine();
            if(!msg.startsWith("START")){
@@ -87,7 +87,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
                     }
                     send.flush();
                     String[] responses = recieve.readLine().split(" "); // Out of bound ERROR for 1
-                    System.out.println(Arrays.toString(responses));
+                    System.out.println(responses[0]);
                     String[] addrs = new String[3];
                     if (Objects.equals(responses[0], "VALUE")) {
                         String[] values = new String[Integer.parseInt(responses[1])];
@@ -97,7 +97,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
                         }
                         return String.join(" ", values);
                     } else if (Objects.equals(responses[0], "NOPE") && x == 0) {
-                        send.write("NEAREST? " + HashID.otherhash(key));
+                        send.write("NEAREST? " + HashID.otherhash(key) + "\n");
                         send.flush();
                         for (int i = 0; i < 3; i++) {
                             recieve.readLine();
@@ -108,7 +108,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
                     String[] node = addrs[x].split(":");
                     socket = new Socket(node[0],Integer.parseInt(node[1]));
                     recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    send = new OutputStreamWriter(socket.getOutputStream());
+                    //send = new OutputStreamWriter(socket.getOutputStream());
                     x++;    System.out.println(x);
             }
             return null;
@@ -131,9 +131,9 @@ public class TemporaryNode implements TemporaryNodeInterface {
         if(tn.start("imranc@city.ac.uk","127.0.0.1:4567")){
             System.out.println("connected");
         }
-       if(tn.store("hello there","does it work?")){
-           System.out.println("it works");
-        }
-        //tn.get("hello there");
+       //if(tn.store("hello there","does it work?")){
+          // System.out.println("it works");
+        //}
+        tn.get("hello there");
     }
 }

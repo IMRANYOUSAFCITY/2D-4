@@ -31,7 +31,7 @@ public class FullNode implements FullNodeInterface {
     ServerSocket serverSocket;
     Socket clientSocket;
     BufferedReader recieve;
-    Writer send;
+    BufferedWriter send;
 
     boolean start = false;
     public boolean listen(String ipAddress, int portNumber) {
@@ -81,7 +81,7 @@ public class FullNode implements FullNodeInterface {
         recieve = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         String msg = recieve.readLine();
         if(msg.startsWith("START")) {
-            send = new OutputStreamWriter(clientSocket.getOutputStream());
+            send =new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
             send.write("START " + 1 + name + "\n");
             System.out.println("START " + 1 + name);
             send.flush();
@@ -153,7 +153,7 @@ public class FullNode implements FullNodeInterface {
 
     public static void main(String[] args) {
         FullNode f = new FullNode();
-        //f.keyValue.put("hello there","does it work?");
+        f.keyValue.put("hello there","does it work?");
         f.listen("127.0.0.1",4567);
         f.handleIncomingConnections("imranc@city.ac.uk","127.0.0.1:4567");
     }

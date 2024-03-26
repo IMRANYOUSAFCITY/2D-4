@@ -113,7 +113,7 @@ public class FullNode implements FullNodeInterface {
             send.write("SUCCESS" + "\n");
             send.flush();
         }catch(Exception e){
-            System.out.println("error in full node");
+            System.out.println("error in store");
             throw new RuntimeException(e);
         }
     }
@@ -125,7 +125,7 @@ public class FullNode implements FullNodeInterface {
                 keys[x] = recieve.readLine();
             }
             String key = String.join(" ",keys);
-            String value = keyValue.get(key);
+            String value = keyValue.get(key);//ERROR here
             String[] values = value.split(" ");
             send.write("VALUE " + values.length + "\n");
             for(String v :values){
@@ -133,7 +133,7 @@ public class FullNode implements FullNodeInterface {
             }
             send.flush();
         }catch(Exception e){
-            System.out.println("error in full node");
+            System.out.println("error in get");
             throw new RuntimeException(e);
         }
     }
@@ -145,7 +145,7 @@ public class FullNode implements FullNodeInterface {
             networkMap.get(x).add(String.join(" ", n, recieve.readLine()));
             send.write("NOTIFIED");
         }catch(Exception e){
-            System.out.println("error in full node");
+            System.out.println("error in Notify");
             throw new RuntimeException(e);
         }
     }
@@ -153,7 +153,7 @@ public class FullNode implements FullNodeInterface {
 
     public static void main(String[] args) {
         FullNode f = new FullNode();
-        f.keyValue.put("hello there","does it work?");
+        //f.keyValue.put("hello there","does it work?");
         f.listen("127.0.0.1",4567);
         f.handleIncomingConnections("imranc@city.ac.uk","127.0.0.1:4567");
     }

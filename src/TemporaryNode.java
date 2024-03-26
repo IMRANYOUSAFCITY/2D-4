@@ -100,7 +100,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
                         send.write("NEAREST? " + HashID.otherhash(key) + "\n");
                         send.flush();
                         for (int i = 0; i < 3; i++) {
-                            recieve.readLine();
+                            System.out.println(recieve.readLine());
                             addrs[i] = recieve.readLine();
                             System.out.println(addrs[i]);
                         }

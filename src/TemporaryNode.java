@@ -108,6 +108,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
                     socket = new Socket(node[0],Integer.parseInt(node[1]));
                     recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     send = new OutputStreamWriter(socket.getOutputStream());
+                    x++;
             }
             return null;
         } catch (IOException e) {

@@ -86,8 +86,8 @@ public class TemporaryNode implements TemporaryNodeInterface {
                         System.out.println(s);
                     }
                     send.flush();
-                    String[] responses = recieve.readLine().split(" ");
-                    System.out.println(responses[0] + " " + responses[1]);
+                    String[] responses = recieve.readLine().split(" "); // Out of bound ERROR for 1
+                    System.out.println(Arrays.toString(responses));
                     String[] addrs = new String[3];
                     if (Objects.equals(responses[0], "VALUE")) {
                         String[] values = new String[Integer.parseInt(responses[1])];

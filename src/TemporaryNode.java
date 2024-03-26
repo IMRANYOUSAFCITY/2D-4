@@ -97,7 +97,8 @@ public class TemporaryNode implements TemporaryNodeInterface {
                         }
                         return String.join(" ", values);
                     } else if (Objects.equals(responses[0], "NOPE") && x == 0) {
-                        send.write("NEAREST? " + HashID.otherhash(key) + "\n");
+                        send.write("NEAREST? " + HashID.otherhash(key + "\n") + "\n");
+                        System.out.println(HashID.otherhash(key));
                         send.flush();
                         for (int i = 0; i < 3; i++) {
                             System.out.println(recieve.readLine());

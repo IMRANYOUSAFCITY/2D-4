@@ -51,15 +51,15 @@ public class TemporaryNode implements TemporaryNodeInterface {
         try {
             String[] keys = key.split(" ");
             String[] values = value.split(" ");
-            send.write("PUT? " + keys.length + " " + values.length);
+            send.write("PUT? " + keys.length + " " + values.length + "\n");
             System.out.println("PUT? " + keys.length + " " + values.length);
             for(String s : keys){
                 System.out.println(s);
-                send.write(s);
+                send.write(s + "\n");
             }
             for(String s : values){
                 System.out.println(s);
-                send.write(s);
+                send.write(s + "\n");
             }
             send.flush();
             String response = recieve.readLine();

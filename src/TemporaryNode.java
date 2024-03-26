@@ -102,8 +102,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
                         System.out.println("NEAREST? " + HashID.otherhash(key + "\n"));
                         send.flush();
                         for (int i = 0; i < 3; i++) {
-                            System.out.println(recieve.readLine());
-                            addrs[i] = recieve.readLine();
+                            addrs[i] = String.join(":",recieve.readLine(),recieve.readLine());
                             System.out.println(addrs[i]);
                         }
                     }
@@ -120,12 +119,48 @@ public class TemporaryNode implements TemporaryNodeInterface {
             return null;
         }
     }
-    public String nearest(String key) throws Exception {
-        send.write("NEAREST " + HashID.byteToHex(HashID.computeHashID(key)));
-        if(recieve.readLine().startsWith("NODES")){
-           return  String.join(" ",recieve.readLine(),recieve.readLine());
+    public String put(String key){
+        try{
+            String[] keys = key.split(" ");
+            if (keys.length == 0) {
+                return null;
+            }
+            send.write("GET? " + keys.length + "\n");
+            System.out.println("GET? " + keys.length);
+            for (String s : keys) {
+                send.write(s + "\n");
+                System.out.println(s);
+            }
+            send.flush();
+            String[] responses = recieve.readLine().split(" ");
+            System.out.println(responses[0]);
+            String[] addrs = new String[3];
+            if (Objects.equals(responses[0], "VALUE")) {
+                String[] values = new String[Integer.parseInt(responses[1])];
+                for (int i = 0; i < Integer.parseInt(responses[1]); i++) {
+                    values[i] = recieve.readLine();
+                    System.out.println(values[i]);
+                }
+                return String.join(" ", values);
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            System.out.println("ERROR in temp node");
+            return null;
         }
         return null;
+    }
+    public String[] nearest(String key) throws Exception {
+        send.write("NEAREST? " + HashID.otherhash(key + "\n"));
+        System.out.println("NEAREST? " + HashID.otherhash(key + "\n"));
+        send.flush();
+        String[] addrs = new String[3];
+        for (int i = 0; i < 3; i++) {
+            recieve.readLine();
+            addrs[i] = recieve.readLine();
+            System.out.println(addrs[i]);
+        }
+        return addrs;
     }
 
     public static void main(String[] args) {

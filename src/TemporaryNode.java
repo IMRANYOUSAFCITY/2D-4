@@ -51,15 +51,15 @@ public class TemporaryNode implements TemporaryNodeInterface {
         try {
             String[] keys = key.split(" ");
             String[] values = value.split(" ");
-            send.write("PUT? " + keys.length + " " + values.length + "\n");
+            send.write("PUT? " + keys.length + " " + values.length);
             System.out.println("PUT? " + keys.length + " " + values.length);
             for(String s : keys){
                 System.out.println(s);
-                send.write(s + "\n");
+                send.write(s);
             }
             for(String s : values){
                 System.out.println(s);
-                send.write(s + "\n");
+                send.write(s);
             }
             send.flush();
             String response = recieve.readLine();
@@ -108,8 +108,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
                     socket = new Socket(node[0],Integer.parseInt(node[1]));
                     recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     send = new OutputStreamWriter(socket.getOutputStream());
-                    x++;
-                    System.out.println(x);
+                    x++;    System.out.println(x);
             }
             return null;
         } catch (IOException e) {

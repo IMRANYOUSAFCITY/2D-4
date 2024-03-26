@@ -130,9 +130,9 @@ public class TemporaryNode implements TemporaryNodeInterface {
         if(tn.start("imranc@city.ac.uk","127.0.0.1:4567")){
             System.out.println("connected");
         }
-       //if(tn.store("hello there","does it work?")){
-         //  System.out.println("it works");
-        //}
-        tn.get("hello there");
+       if(tn.store("hello there","does it work?")){
+           System.out.println("it works");
+        }
+        //tn.get("hello there");
     }
 }

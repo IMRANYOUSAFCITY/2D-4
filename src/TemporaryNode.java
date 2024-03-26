@@ -99,7 +99,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
                     } else if (Objects.equals(responses[0], "NOPE") && x == 0) {
                         send.write("NEAREST? " + HashID.otherhash(key));
                         send.flush();
-                        for (int i = 0; i < 6; i++) {
+                        for (int i = 0; i < 3; i++) {
                             recieve.readLine();
                             addrs[i] = recieve.readLine();
                         }

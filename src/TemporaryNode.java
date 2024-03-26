@@ -73,53 +73,30 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public String get(String key) {
         try {
-            String[] node;
-            int x = 0;
-            while (x < 3) {
-                    String[] keys = key.split(" ");
-                    if (keys.length == 0) {
-                    return null;
-                    }
-                    send.write("GET? " + keys.length + "\n");
-                    System.out.println("GET? " + keys.length);
-                    for (String s : keys) {
-                        send.write(s + "\n");
-                        System.out.println(s);
-                    }
-                    send.flush();
-                    String[] responses = recieve.readLine().split(" ");
-                    System.out.println(responses[0]);
-                    String[] addrs = new String[3];
-                    if (Objects.equals(responses[0], "VALUE")) {
-                        String[] values = new String[Integer.parseInt(responses[1])];
-                        for (int i = 0; i < Integer.parseInt(responses[1]); i++) {
-                            values[i] = recieve.readLine();
-                            System.out.println(values[i]);
-                        }
-                        return String.join(" ", values);
-                    } else if (Objects.equals(responses[0], "NOPE") && x == 0) {
-                        send.write("NEAREST? " + HashID.otherhash(key + "\n"));
-                        System.out.println("NEAREST? " + HashID.otherhash(key + "\n"));
-                        send.flush();
-                        for (int i = 0; i < 3; i++) {
-                            addrs[i] = String.join(":",recieve.readLine(),recieve.readLine());
-                            System.out.println(addrs[i]);
-                        }
-                    }
-                    node = addrs[x].split(":");
-                    socket = new Socket(node[0],Integer.parseInt(node[1]));
-                    recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    send =new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-                    x++;    System.out.println(x);
+            String value = getValue(key);
+            if(value != null){
+                return value;
+            }
+            String[] nodes = nearest(key);
+            for(String s : nodes){
+                String[] addrs = s.split(":");
+                socket.close();
+                recieve.close();
+                send.close();
+                socket = new Socket(addrs[0],Integer.parseInt(addrs[1]));
+                recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                send = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                value = getValue(key);
+                if(value != null){
+                    return value;
+                }
             }
             return null;
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            System.out.println("ERROR in temp node");
-            return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
-    public String put(String key){
+    public String getValue(String key){
         try{
             String[] keys = key.split(" ");
             if (keys.length == 0) {
@@ -134,7 +111,6 @@ public class TemporaryNode implements TemporaryNodeInterface {
             send.flush();
             String[] responses = recieve.readLine().split(" ");
             System.out.println(responses[0]);
-            String[] addrs = new String[3];
             if (Objects.equals(responses[0], "VALUE")) {
                 String[] values = new String[Integer.parseInt(responses[1])];
                 for (int i = 0; i < Integer.parseInt(responses[1]); i++) {
@@ -145,7 +121,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
-            System.out.println("ERROR in temp node");
+            System.out.println("ERROR in GetValue node");
             return null;
         }
         return null;
@@ -162,6 +138,55 @@ public class TemporaryNode implements TemporaryNodeInterface {
         }
         return addrs;
     }
+    /*{
+        try {
+            String[] node;
+            int x = 0;
+            while (x < 3) {
+                String[] keys = key.split(" ");
+                if (keys.length == 0) {
+                    return null;
+                }
+                send.write("GET? " + keys.length + "\n");
+                System.out.println("GET? " + keys.length);
+                for (String s : keys) {
+                    send.write(s + "\n");
+                    System.out.println(s);
+                }
+                send.flush();
+                String[] responses = recieve.readLine().split(" ");
+                System.out.println(responses[0]);
+                String[] addrs = new String[3];
+                if (Objects.equals(responses[0], "VALUE")) {
+                    String[] values = new String[Integer.parseInt(responses[1])];
+                    for (int i = 0; i < Integer.parseInt(responses[1]); i++) {
+                        values[i] = recieve.readLine();
+                        System.out.println(values[i]);
+                    }
+                    return String.join(" ", values);
+                } else if (Objects.equals(responses[0], "NOPE") && x == 0) {
+                    send.write("NEAREST? " + HashID.otherhash(key + "\n"));
+                    System.out.println("NEAREST? " + HashID.otherhash(key + "\n"));
+                    send.flush();
+                    for (int i = 0; i < 3; i++) {
+                        addrs[i] = String.join(":",recieve.readLine(),recieve.readLine());
+                        System.out.println(addrs[i]);
+                    }
+                }
+                node = addrs[x].split(":");
+                socket = new Socket(node[0],Integer.parseInt(node[1]));
+                recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                send =new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                x++;    System.out.println(x);
+            }
+            return null;
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            System.out.println("ERROR in temp node");
+            return null;
+        }
+    } */
+
 
     public static void main(String[] args) {
         TemporaryNode tn = new TemporaryNode();

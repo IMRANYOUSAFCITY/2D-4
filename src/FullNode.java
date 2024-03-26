@@ -52,63 +52,18 @@ public class FullNode implements FullNodeInterface {
     
     public void handleIncomingConnections(String startingNodeName, String startingNodeAddress) {
         try {
-            if (!start) {
-                name = startingNodeName;
-                address = startingNodeAddress;
-                clientSocket = serverSocket.accept();
-                String node = String.join(" ",startingNodeName,startingNodeAddress);
-                networkMap.put(0,new ArrayList<String>());
-                networkMap.get(0).add(String.join(" ",name,address));
-                recieve = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                String msg = recieve.readLine();
-                if(msg.startsWith("START")) {
-                    send = new OutputStreamWriter(clientSocket.getOutputStream());
-                    send.write("START " + 1 + name + "\n");
-                    System.out.println("START " + 1 + name);
-                    send.flush();
-                    System.out.println("node connected");
-                    start = true;
-                }else {
-                    System.out.println("not connected");
-                }
+            name = startingNodeName;
+            address = startingNodeAddress;
+            if(!start){
+                start();
             }
             String msg = recieve.readLine();
             if(msg.startsWith("PUT?")){
-                String[] s = msg.split(" ");
-                String[] keys = new String[Integer.parseInt(s[1])];
-                String[] values = new String[Integer.parseInt(s[2])];;
-                for(int x = 0; x < Integer.parseInt(s[1]); x++){
-                    keys[x] = recieve.readLine();
-                }
-                for(int x = 0; x < Integer.parseInt(s[2]); x++){
-                    values[x] = recieve.readLine();
-                }
-                String key = String.join(" ",keys);
-                String value = String.join(" ",values);
-                //int distance = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(key)))
-                keyValue.put(key,value);
-                send.write("SUCCESS" + "\n");
-                send.flush();
+                put(msg);
             } else if(msg.startsWith("GET?")){
-                String[] s = msg.split(" ");
-                String[] keys = new String[Integer.parseInt(s[1])];
-                for(int x = 0; x < Integer.parseInt(s[1]); x++){
-                   keys[x] = recieve.readLine();
-                }
-                String key = String.join(" ",keys);
-                String value = keyValue.get(key);
-                String[] values = value.split(" ");
-                send.write("VALUE " + values.length + "\n");
-                for(String v :values){
-                    send.write(v + "\n");
-                }
-                send.flush();
+                get(msg);
             } else if (msg.startsWith("NOTIFY")) {
-                String n = recieve.readLine();
-                int x = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(name + "\n")),HashID.byteToHex(HashID.computeHashID(n + "\n")));
-                networkMap.put(x,new ArrayList<>());
-                networkMap.get(x).add(String.join(" ",n,recieve.readLine()));
-                send.write("NOTIFIED");
+                notify(msg);
             }
 
         } catch(Exception e){
@@ -116,6 +71,83 @@ public class FullNode implements FullNodeInterface {
             throw new RuntimeException(e);
         }
 	// Implement this!
+    }
+    public void start(){
+        try{
+        clientSocket = serverSocket.accept();
+        String node = String.join(" ",name,address);
+        networkMap.put(0,new ArrayList<String>());
+        networkMap.get(0).add(String.join(" ",name,address));
+        recieve = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        String msg = recieve.readLine();
+        if(msg.startsWith("START")) {
+            send = new OutputStreamWriter(clientSocket.getOutputStream());
+            send.write("START " + 1 + name + "\n");
+            System.out.println("START " + 1 + name);
+            send.flush();
+            System.out.println("node connected");
+            start = true;
+        }else {
+            System.out.println("not connected");
+        }
+        }catch(Exception e){
+            System.out.println("error in full node");
+            throw new RuntimeException(e);
+        }
+    }
+    public void put(String s){
+        try{
+            String[] strings = s.split(" ");
+            String[] keys = new String[Integer.parseInt(strings[1])];
+            String[] values = new String[Integer.parseInt(strings[2])];;
+            for(int x = 0; x < Integer.parseInt(strings[1]); x++){
+                keys[x] = recieve.readLine();
+            }
+            for(int x = 0; x < Integer.parseInt(strings[2]); x++){
+                values[x] = recieve.readLine();
+            }
+            String key = String.join(" ",keys);
+            String value = String.join(" ",values);
+            //int distance = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(key)))
+            keyValue.put(key,value);
+            send.write("SUCCESS" + "\n");
+            send.flush();
+        }catch(Exception e){
+            System.out.println("error in full node");
+            throw new RuntimeException(e);
+        }
+    }
+    public void get(String s){
+        try{
+            String[] strings = s.split(" ");
+            String[] keys = new String[Integer.parseInt(strings[1])];
+            for(int x = 0; x < Integer.parseInt(strings[1]); x++){
+                keys[x] = recieve.readLine();
+            }
+            String key = String.join(" ",keys);
+            String value = keyValue.get(key);
+            String[] values = value.split(" ");
+            send.write("VALUE " + values.length + "\n");
+            for(String v :values){
+                send.write(v + "\n");
+            }
+            send.flush();
+        }catch(Exception e){
+            System.out.println("error in full node");
+            throw new RuntimeException(e);
+        }
+    }
+    public void notify(String s){
+        try {
+            String n = recieve.readLine();
+            int x = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(name + "\n")), HashID.byteToHex(HashID.computeHashID(n + "\n")));
+            networkMap.put(x, new ArrayList<>());
+            networkMap.get(x).add(String.join(" ", n, recieve.readLine()));
+            send.write("NOTIFIED");
+        }catch(Exception e){
+            System.out.println("error in full node");
+            throw new RuntimeException(e);
+        }
     }
 
 

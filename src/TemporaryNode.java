@@ -47,7 +47,6 @@ public class TemporaryNode implements TemporaryNodeInterface {
         }
 	return true;
     }
-
     public boolean store(String key, String value) {
         try {
             String[] keys = key.split(" ");
@@ -74,26 +73,41 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public String get(String key) {
         try {
-            String[] keys = key.split(" ");
-            if(keys.length == 0){
-                return null;
-            }
-            send.write("GET? " + keys.length +"\n");
-            System.out.println("GET? " + keys.length);
-            for(String s : keys){
-                send.write(s + "\n");
-                System.out.println(s);
-            }
-            send.flush();
-            String[] responses = recieve.readLine().split(" ");
-            System.out.println(responses[0] + " " + responses[1]);
-            if(Objects.equals(responses[0], "VALUE")){
-                String[] values = new String[Integer.parseInt(responses[1])];
-                for(int i = 0; i < Integer.parseInt(responses[1]); i++){
-                    values[i] = recieve.readLine();
-                    System.out.println(values[i]);
-                }
-                return String.join(" ",values);
+            int x = 0;
+            while (x < 3) {
+                    String[] keys = key.split(" ");
+                    if (keys.length == 0) {
+                    return null;
+                    }
+                    send.write("GET? " + keys.length + "\n");
+                    System.out.println("GET? " + keys.length);
+                    for (String s : keys) {
+                        send.write(s + "\n");
+                        System.out.println(s);
+                    }
+                    send.flush();
+                    String[] responses = recieve.readLine().split(" ");
+                    System.out.println(responses[0] + " " + responses[1]);
+                    String[] addrs = new String[3];
+                    if (Objects.equals(responses[0], "VALUE")) {
+                        String[] values = new String[Integer.parseInt(responses[1])];
+                        for (int i = 0; i < Integer.parseInt(responses[1]); i++) {
+                            values[i] = recieve.readLine();
+                            System.out.println(values[i]);
+                        }
+                        return String.join(" ", values);
+                    } else if (Objects.equals(responses[0], "NOPE") && x == 0) {
+                        send.write("NEAREST? " + HashID.otherhash(key));
+                        send.flush();
+                        for (int i = 0; i < 6; i++) {
+                            recieve.readLine();
+                            addrs[i] = recieve.readLine();
+                        }
+                    }
+                    String[] node = addrs[x].split(":");
+                    socket = new Socket(node[0],Integer.parseInt(node[1]));
+                    recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    send = new OutputStreamWriter(socket.getOutputStream());
             }
             return null;
         } catch (IOException e) {
@@ -105,7 +119,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
     public String nearest(String key) throws Exception {
         send.write("NEAREST " + HashID.byteToHex(HashID.computeHashID(key)));
         if(recieve.readLine().startsWith("NODES")){
-           return String.join(" ",recieve.readLine(),recieve.readLine());
+           return  String.join(" ",recieve.readLine(),recieve.readLine());
         }
         return null;
     }
@@ -115,9 +129,9 @@ public class TemporaryNode implements TemporaryNodeInterface {
         if(tn.start("imranc@city.ac.uk","127.0.0.1:4567")){
             System.out.println("connected");
         }
-        if(tn.store("hello there","does it work?")){
-            System.out.println("it works");
-        }
-        //tn.get("hello there");
+       //if(tn.store("hello there","does it work?")){
+         //  System.out.println("it works");
+        //}
+        tn.get("hello there");
     }
 }

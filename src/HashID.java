@@ -6,6 +6,7 @@
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class HashID {
 
@@ -58,6 +59,21 @@ public class HashID {
 		}
 		return 256 - (Integer.parseInt(xOR,2) + (x * 4));
 	}
+	public static String otherhash(String s) {
+		try {
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			byte[] hashBytes = digest.digest(s.getBytes());
+			StringBuilder hexString = new StringBuilder();
+			for (byte b : hashBytes) {
+
+				hexString.append(String.format("%02X", b));
+			}
+			return hexString.toString();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 
 	public static void main(String[] args) throws Exception {
@@ -67,6 +83,6 @@ public class HashID {
 		System.out.println(HashID.byteToHex(HashID.computeHashID(s1 + "\n")));
 		System.out.println(HashID.byteToHex(HashID.computeHashID(s2 + "\n")));
 		//System.out.println(calculateDistance(HashID.byteToHex(HashID.computeHashID(s1 + "\n")),HashID.byteToHex(HashID.computeHashID(s2 + "\n"))));
-
+		System.out.println(HashID.otherhash("Hello World!"));
 	}
 }

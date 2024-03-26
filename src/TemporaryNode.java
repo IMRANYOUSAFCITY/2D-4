@@ -102,6 +102,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
                         for (int i = 0; i < 3; i++) {
                             recieve.readLine();
                             addrs[i] = recieve.readLine();
+                            System.out.println(addrs[i]);
                         }
                     }
                     String[] node = addrs[x].split(":");

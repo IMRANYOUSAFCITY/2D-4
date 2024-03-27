@@ -73,8 +73,8 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public String get(String key) {
         try {
-            String[] nodes = nearest(key);
             String value = getValue(key);
+            String[] nodes = nearest(key);
             if(value != null){
                 return value;
             }

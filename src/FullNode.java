@@ -32,7 +32,7 @@ public class FullNode implements FullNodeInterface {
     Socket clientSocket;
     BufferedReader recieve;
     BufferedWriter send;
-
+    boolean connected = false;
     boolean start = false;
     public boolean listen(String ipAddress, int portNumber) {
         try {
@@ -56,9 +56,11 @@ public class FullNode implements FullNodeInterface {
             address = startingNodeAddress;
             if(!start){
                 start();
+                connected = true;
             }
-            String msg = recieve.readLine();
-            System.out.println(msg);
+            while (connected) {
+                String msg = recieve.readLine();
+                System.out.println(msg);
                 if (msg.startsWith("PUT?")) {
                     put(msg);
                 } else if (msg.startsWith("GET?")) {
@@ -68,14 +70,18 @@ public class FullNode implements FullNodeInterface {
                 } else if (msg.startsWith("NEAREST?")) {
                     send.write("NODES " + 3 + "\n");
                     send.write("name1" + "\n");
-                    send.write("address1" + "\n");
+                    send.write("ip1:1234" + "\n");
                     send.write("name2" + "\n");
-                    send.write("address2" + "\n");
+                    send.write("ip2:2345" + "\n");
                     send.write("name3" + "\n");
-                    send.write("address3" + "\n");
+                    send.write("ip3:3456" + "\n");
                     send.flush();
                     System.out.println("it reaches");
+                } else if (msg.startsWith("END")) {
+                    clientSocket.close();
+                    connected = false;
                 }
+            }
 
         } catch(Exception e){
             System.out.println("error in full node");

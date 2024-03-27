@@ -74,10 +74,10 @@ public class TemporaryNode implements TemporaryNodeInterface {
     public String get(String key) {
         try {
             String value = getValue(key);
-            String[] nodes = nearest(key);
             if(value != null){
                 return value;
             }
+            String[] nodes = nearest(key);
             for(String s : nodes){
                 String[] addrs = s.split(":");
                 socket.close();

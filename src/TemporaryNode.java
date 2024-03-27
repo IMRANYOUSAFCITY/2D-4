@@ -22,16 +22,16 @@ interface TemporaryNodeInterface {
 
 
 public class TemporaryNode implements TemporaryNodeInterface {
-    BufferedWriter send;
+    PrintWriter send;
     BufferedReader recieve;
     Socket socket;
     public boolean start(String startingNodeName, String startingNodeAddress) {
-        System.out.println("TCPClient connecting to " +  startingNodeAddress);
+        System.out.println("Temporary Node connecting to " +  startingNodeAddress);
         String[] addrs = startingNodeAddress.split(":");
         try {
            socket = new Socket(addrs[0],Integer.parseInt(addrs[1]));
            recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-           send = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+           send = new PrintWriter((new OutputStreamWriter(socket.getOutputStream())),true);
            send.write("START 1 "  + startingNodeName + "\n");
            send.flush();
            String msg = recieve.readLine();
@@ -73,11 +73,11 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public String get(String key) {
         try {
+            String[] nodes = nearest(key);
             String value = getValue(key);
             if(value != null){
                 return value;
             }
-            String[] nodes = nearest(key);
             for(String s : nodes){
                 String[] addrs = s.split(":");
                 socket.close();
@@ -124,17 +124,24 @@ public class TemporaryNode implements TemporaryNodeInterface {
         }
         return null;
     }
-    public String[] nearest(String key) throws Exception {
-        send.write("NEAREST? " + HashID.otherhash(key + "\n"));
-        System.out.println("NEAREST? " + HashID.otherhash(key + "\n"));
-        send.flush();
+    public String[] nearest(String key) {
+        try{
+        send.write("NEAREST? " + HashID.otherhash(key) + "\n");
+        System.out.println("NEAREST? " + HashID.otherhash(key) + "\n");
+        send.flush();//ERROR
         String[] addrs = new String[3];
+        String[] names = new String[3];
         for (int i = 0; i < 3; i++) {
-            recieve.readLine();
+            names[i] = recieve.readLine();
             addrs[i] = recieve.readLine();
             System.out.println(addrs[i]);
         }
         return addrs;
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            System.out.println("ERROR in Nearest method");
+            return null;
+        }
     }
     /*{
         try {
@@ -186,14 +193,16 @@ public class TemporaryNode implements TemporaryNodeInterface {
     } */
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         TemporaryNode tn = new TemporaryNode();
         if(tn.start("imranc@city.ac.uk","127.0.0.1:4567")){
             System.out.println("connected");
         }
-       //if(tn.store("hello there","does it work?")){
-          // System.out.println("it works");
+     //  if(tn.store("hello there","does it work?")){
+       //    System.out.println("it works");
         //}
+
         tn.get("hello there");
+        //tn.nearest("hello There");
     }
 }

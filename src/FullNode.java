@@ -57,15 +57,24 @@ public class FullNode implements FullNodeInterface {
             if(!start){
                 start();
             }
-                String msg = recieve.readLine();
+            String msg = recieve.readLine();
+            System.out.println(msg);
                 if (msg.startsWith("PUT?")) {
                     put(msg);
                 } else if (msg.startsWith("GET?")) {
                     get(msg);
                 } else if (msg.startsWith("NOTIFY")) {
                     notify(msg);
-                } else if (msg.startsWith("NEAREST")) {
-
+                } else if (msg.startsWith("NEAREST?")) {
+                    send.write("NODES " + 3 + "\n");
+                    send.write("name1" + "\n");
+                    send.write("address1" + "\n");
+                    send.write("name2" + "\n");
+                    send.write("address2" + "\n");
+                    send.write("name3" + "\n");
+                    send.write("address3" + "\n");
+                    send.flush();
+                    System.out.println("it reaches");
                 }
 
         } catch(Exception e){
@@ -152,6 +161,7 @@ public class FullNode implements FullNodeInterface {
             networkMap.put(x, new ArrayList<>());
             networkMap.get(x).add(String.join(" ", n, recieve.readLine()));
             send.write("NOTIFIED");
+            send.flush();
         }catch(Exception e){
             System.out.println("error in Notify");
             throw new RuntimeException(e);

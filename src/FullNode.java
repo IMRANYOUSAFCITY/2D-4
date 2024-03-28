@@ -53,7 +53,7 @@ public class FullNode implements FullNodeInterface {
             name = startingNodeName;
             address = startingNodeAddress;
             if(!start){
-                start();
+                respondStart();
                 connected = true;
             }
             while (connected) {
@@ -90,7 +90,7 @@ public class FullNode implements FullNodeInterface {
         }
 	// Implement this!
     }
-    public void start(){
+    public void respondStart(){
         try{
         clientSocket = serverSocket.accept();
         String node = String.join(" ",name,address);

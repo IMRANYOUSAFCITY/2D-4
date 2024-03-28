@@ -126,14 +126,15 @@ public class TemporaryNode implements TemporaryNodeInterface {
     }
     public String[] nearest(String key) {
         try{
-            send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n"))+"\n");
+            send.write("NEAREST? " + HashID.otherhash(key + "\n")+"\n");
             System.out.println("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n")));
             send.flush();
-            if(!recieve.readLine().startsWith("NODES")){
+            String[] response = recieve.readLine().split(" ");
+            if(!(Objects.equals(response[0], "NODES"))){
                 return null;
             }
-            String[] addrs = new String[3];
-            String[] names = new String[3];
+            String[] addrs = new String[Integer.parseInt(response[1])];
+            String[] names = new String[Integer.parseInt(response[1])];
             for (int i = 0; i < 3; i++) {
                 names[i] = recieve.readLine();
                 addrs[i] = recieve.readLine();

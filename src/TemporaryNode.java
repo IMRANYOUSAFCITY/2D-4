@@ -126,7 +126,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
     }
     public String[] nearest(String key) {
         try{
-            send.write("NEAREST? " + HashID.otherhash(key + "\n")+"\n");
+            send.write("NEAREST? " + HashID.otherhash(key)+"\n");
             System.out.println("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n")));
             send.flush();
             String[] response = recieve.readLine().split(" ");

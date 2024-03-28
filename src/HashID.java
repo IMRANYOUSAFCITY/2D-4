@@ -83,6 +83,7 @@ public class HashID {
 		System.out.println(HashID.byteToHex(HashID.computeHashID(s1 + "\n")));
 		System.out.println(HashID.byteToHex(HashID.computeHashID(s2 + "\n")));
 		//System.out.println(calculateDistance(HashID.byteToHex(HashID.computeHashID(s1 + "\n")),HashID.byteToHex(HashID.computeHashID(s2 + "\n"))));
-		System.out.println(HashID.otherhash("Hello World!"));
+		System.out.println(HashID.otherhash("test/jabberwocky/1"));
+
 	}
 }

@@ -70,11 +70,11 @@ public class FullNode implements FullNodeInterface {
                 } else if (msg.startsWith("NEAREST?")) {
                     send.write("NODES " + 3 + "\n");
                     send.write("name1" + "\n");
-                    send.write("ip1:1234" + "\n");
+                    send.write("127.0.0.1:2345" + "\n");
                     send.write("name2" + "\n");
-                    send.write("ip2:2345" + "\n");
+                    send.write("127.0.0.1:3456" + "\n");
                     send.write("name3" + "\n");
-                    send.write("ip3:3456" + "\n");
+                    send.write("127.0.0.1:4567" + "\n");
                     send.flush();
                     System.out.println("it reaches");
                 } else if (msg.startsWith("END")) {
@@ -177,7 +177,7 @@ public class FullNode implements FullNodeInterface {
 
     public static void main(String[] args) {
         FullNode f = new FullNode();
-        //f.keyValue.put("hello there","does it work?");
+        f.keyValue.put("hello there","does it work?");
         f.listen("127.0.0.1",4567);
         f.handleIncomingConnections("imranc@city.ac.uk","127.0.0.1:4567");
     }

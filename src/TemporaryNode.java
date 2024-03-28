@@ -74,14 +74,14 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public String get(String key) {
         try {
-           String value = getValue(key);
+            String value = getValue(key);
             if(value != null){
                 return value;
             }
-            String[] nodes = nearest(key).split("\n");
+            String[] nodes = nearest(key);
             end();
-            for(int i = 0; i < 7 ; i +=2){
-                start(nodes[i],nodes[i+1]);
+            for(String s : nodes){
+                start("name",s);
                 value = getValue(key);
                 if(value != null){
                     return value;
@@ -109,12 +109,12 @@ public class TemporaryNode implements TemporaryNodeInterface {
             String[] responses = recieve.readLine().split(" ");
             if (Objects.equals(responses[0], "VALUE")) {
                 System.out.println(responses[0] + " " + responses[1]);
-                String value = "";
+                String[] values = new String[Integer.parseInt(responses[1])];
                 for (int i = 0; i < Integer.parseInt(responses[1]); i++) {
-                    value += recieve.readLine();
+                    values[i] = recieve.readLine();
+                    System.out.println(values[i]);
                 }
-                System.out.println(value);
-                return value;
+                return String.join(" ",values);
             }
             System.out.println(responses[0]);
         } catch (IOException e) {
@@ -124,20 +124,23 @@ public class TemporaryNode implements TemporaryNodeInterface {
         }
         return null;
     }
-    public String nearest(String key) {
+    public String[] nearest(String key) {
         try{
             send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n"))+"\n");
             System.out.println("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n")));
             send.flush();
-            String [] response = recieve.readLine().split(" ");
-            if(!response[0].startsWith("NODES")){
+            if(!recieve.readLine().startsWith("NODES")){
                 return null;
             }
-            String nodes = "";
+            String[] addrs = new String[3];
+            String[] names = new String[3];
             for (int i = 0; i < 3; i++) {
-                nodes += recieve.readLine() + "\n";
+                names[i] = recieve.readLine();
+                addrs[i] = recieve.readLine();
+                System.out.println(names[i]);
+                System.out.println(addrs[i]);
             }
-            return nodes;
+            return addrs;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println("ERROR in Nearest method");

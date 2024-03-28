@@ -73,6 +73,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public String get(String key) {
         try {
+            getValue(key);
             String[] nodes = nearest(key);
             end();
             for(String s : nodes){
@@ -143,7 +144,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
     }
     public String getClosestNode(String key) {
         try{
-            send.write("NEAREST? " + HashID.otherhash(key) + "\n");
+            send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n"))+"\n");
             //System.out.println("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n")));
             send.flush();
             if(!recieve.readLine().startsWith("NODES")){

@@ -10,9 +10,7 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 // DO NOT EDIT starts
 interface FullNodeInterface {
@@ -66,7 +64,7 @@ public class FullNode implements FullNodeInterface {
                 } else if (msg.startsWith("GET?")) {
                     get(msg);
                 } else if (msg.startsWith("NOTIFY")) {
-                    notify(msg);
+                    respondNotify(msg);
                 } else if (msg.startsWith("NEAREST?")) {
                     send.write("NODES " + 3 + "\n");
                     send.write("name1" + "\n");
@@ -77,6 +75,9 @@ public class FullNode implements FullNodeInterface {
                     send.write("127.0.0.1:4567" + "\n");
                     send.flush();
                     System.out.println("it reaches");
+                } else if (msg.startsWith("ECHO")) {
+                    send.write("OCHE" + "\n");
+                    send.flush();
                 } else if (msg.startsWith("END")) {
                     clientSocket.close();
                     connected = false;
@@ -160,12 +161,13 @@ public class FullNode implements FullNodeInterface {
             throw new RuntimeException(e);
         }
     }
-    public void notify(String s){
+    public void respondNotify(String s){
         try {
             String n = recieve.readLine();
             int x = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(name + "\n")), HashID.byteToHex(HashID.computeHashID(n + "\n")));
-            networkMap.put(x, new ArrayList<>());
-            networkMap.get(x).add(String.join(" ", n, recieve.readLine()));
+            if(networkMap.get(x).size() > 3){
+                networkMap.get(x).add(String.join(" ", n, recieve.readLine()));
+            }
             send.write("NOTIFIED");
             send.flush();
         }catch(Exception e){
@@ -173,13 +175,31 @@ public class FullNode implements FullNodeInterface {
             throw new RuntimeException(e);
         }
     }
+    public void nearest(String key){
+        try {
+            String hashID = HashID.byteToHex(HashID.computeHashID(key + "\n"));
+            List near = new ArrayList<String>();
+            for (Integer distance : networkMap.keySet()) {
+                for (String s : networkMap.get(distance)){
+                    String[] node = s.split(" ");
+                    HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(node[0] + "\n")),HashID.byteToHex(HashID.computeHashID(key + "\n")));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void notify(String nodeName,String nodeAddress){
+
+    }
+
 
 
     public static void main(String[] args) {
         FullNode f = new FullNode();
         f.keyValue.put("hello there","does it work?");
-        f.listen("127.0.0.1",1234);
-        f.handleIncomingConnections("imranc@city.ac.uk","127.0.0.1:1234");
+        f.listen("127.0.0.1",2345);
+        f.handleIncomingConnections("imranc@city.ac.uk","127.0.0.1:2345");
     }
     //test
 }

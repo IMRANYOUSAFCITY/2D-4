@@ -73,12 +73,17 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public String get(String key) {
         try {
-            getValue(key);
+           String value = getValue(key);
+            if(value != null){
+                return value;
+            }
             String[] nodes = nearest(key);
+            System.out.println(nodes);
             end();
             for(String s : nodes){
+                System.out.println(s);
                 start("name",s);
-                String value = getValue(key);
+                value = getValue(key);
                 if(value != null){
                     return value;
                 }
@@ -227,8 +232,8 @@ public class TemporaryNode implements TemporaryNodeInterface {
          //  System.out.println("it works");
         //}
         //System.out.println(tn.getClosestNode("hello there"));
-        tn.get("hello there");
-        //tn.nearest("hello There");
+        //tn.get("hello there");
+        tn.nearest("hello There");
         tn.end();
     }
 }

@@ -148,14 +148,14 @@ public class TemporaryNode implements TemporaryNodeInterface {
     }
     public String getClosestNode(String key) {
         try{
-            send.write("NEAREST? " + HashID.otherhash(key) + "\n");
+            send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n")));
             System.out.println("NEAREST? " + HashID.otherhash(key) + "\n");
             send.flush();
             if(!recieve.readLine().startsWith("NODES")){
                 return null;
             }
             return String.join(" ",recieve.readLine(),recieve.readLine());
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println("ERROR in Nearest method");
             return null;

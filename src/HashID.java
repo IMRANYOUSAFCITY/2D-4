@@ -29,7 +29,7 @@ public class HashID {
 		for (byte i : byteArray) {
 			hex += String.format("%02X", i & 0xFF);
 		}
-		return hex;
+		return hex.toLowerCase();
 	}
 	public static int calculateDistance(String s1, String s2){
 		char[] c1 = s1.toCharArray();

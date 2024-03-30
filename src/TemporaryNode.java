@@ -49,6 +49,22 @@ public class TemporaryNode implements TemporaryNodeInterface {
 	return true;
     }
     public boolean store(String key, String value) {
+        if(storeValue(key,value)){
+            return true;
+        }
+        String[] nodes = nearest(key);
+        System.out.println(Arrays.toString(nodes));
+        end();
+        for(String s : nodes){
+            start("name",s);
+            if(storeValue(key,value)){
+                return true;
+            }
+            end();
+        }
+        return false;
+    }
+    public boolean storeValue(String key, String value){
         try {
             String[] keys = key.split(" ");
             String[] values = value.split(" ");
@@ -74,11 +90,11 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public String get(String key) {
         try {
-            String[] nodes = nearest(key);
             String value = getValue(key);
             if(value != null){
                 return value;
             }
+            String[] nodes = nearest(key);
             end();
             for(String s : nodes){
                 start("name",s);
@@ -130,6 +146,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
             System.out.println("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n")));
             send.flush();
             String[] response = recieve.readLine().split(" ");
+            System.out.println(response[0] + " " + response[1]);
             if(!(Objects.equals(response[0], "NODES"))){
                 return null;
             }
@@ -255,7 +272,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public static void main(String[] args) throws Exception {
         TemporaryNode tn = new TemporaryNode();
-        if(tn.start("imranc@city.ac.uk","127.0.0.1:1234")){
+        if(tn.start("imran:node-1","127.0.0.1:4567")){
             System.out.println("connected");
         }
        //if(tn.store("hello there","does it work?")){
@@ -263,7 +280,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
         //}
         //System.out.println(tn.getClosestNode("hello there"));
         tn.get("hello there");
-        //tn.nearest("hello There");
+        //tn.nearest("hello hello");
         tn.end();
     }
 }

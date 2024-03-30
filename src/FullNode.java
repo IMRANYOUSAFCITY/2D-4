@@ -10,6 +10,7 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.KeyPair;
 import java.util.*;
 
 // DO NOT EDIT starts
@@ -23,7 +24,7 @@ interface FullNodeInterface {
 public class FullNode implements FullNodeInterface {
     String name;
     String address;
-    HashMap<Integer, ArrayList<String>> networkMap = new HashMap<>();
+    Map<Integer, List<String>> networkMap = new HashMap<>();
 
     HashMap<String, String> keyValue = new HashMap<String, String>();
     ServerSocket serverSocket;
@@ -52,6 +53,8 @@ public class FullNode implements FullNodeInterface {
         try {
             name = startingNodeName;
             address = startingNodeAddress;
+            networkMap.put(0,new ArrayList<>());
+            networkMap.get(0).add(String.join(" ", name, address));
             if(!start){
                 respondStart();
                 connected = true;
@@ -64,17 +67,16 @@ public class FullNode implements FullNodeInterface {
                 } else if (msg.startsWith("GET?")) {
                     get(msg);
                 } else if (msg.startsWith("NOTIFY")) {
-                    respondNotify(msg);
+                    respondNotify();
                 } else if (msg.startsWith("NEAREST?")) {
-                    send.write("NODES " + 3 + "\n");
-                    send.write("name1" + "\n");
-                    send.write("127.0.0.1:2345" + "\n");
-                    send.write("name2" + "\n");
-                    send.write("127.0.0.1:3456" + "\n");
-                    send.write("name3" + "\n");
-                    send.write("127.0.0.1:4567" + "\n");
+                    String[] nodes = nearest(msg).split(" ");
+                    send.write("NODES " + nodes.length/2 + "\n");
+                    System.out.println("NODES " + nodes.length/2);
+                    for (String s : nodes){
+                        send.write(s + "\n");
+                        System.out.println(s);
+                    }
                     send.flush();
-                    System.out.println("it reaches");
                 } else if (msg.startsWith("ECHO")) {
                     send.write("OCHE" + "\n");
                     send.flush();
@@ -90,12 +92,19 @@ public class FullNode implements FullNodeInterface {
         }
 	// Implement this!
     }
+    public boolean addNode(String nodeName,String nodeAddress) throws Exception {
+        int x = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(nodeName + "\n")),HashID.byteToHex(HashID.computeHashID(nodeAddress + "\n")));
+        if(!networkMap.containsKey(x)){
+            networkMap.put(x,new ArrayList<>());
+        } else if(networkMap.get(x).size() == 3){
+            networkMap.get(x).remove(2);
+        }
+        networkMap.get(x).add(String.join(" ", nodeName, nodeAddress));
+        return true;
+    }
     public void respondStart(){
         try{
         clientSocket = serverSocket.accept();
-        String node = String.join(" ",name,address);
-        networkMap.put(0,new ArrayList<String>());
-        networkMap.get(0).add(String.join(" ",name,address));
         recieve = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         String msg = recieve.readLine();
         if(msg.startsWith("START")) {
@@ -116,20 +125,26 @@ public class FullNode implements FullNodeInterface {
     public void put(String s){
         try{
             String[] strings = s.split(" ");
+            System.out.println(Arrays.toString(strings));
             String[] keys = new String[Integer.parseInt(strings[1])];
-            String[] values = new String[Integer.parseInt(strings[2])];;
             for(int x = 0; x < Integer.parseInt(strings[1]); x++){
                 keys[x] = recieve.readLine();
             }
-            for(int x = 0; x < Integer.parseInt(strings[2]); x++){
-                values[x] = recieve.readLine();
-            }
             String key = String.join(" ",keys);
-            String value = String.join(" ",values);
-            //int distance = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(key)))
-            keyValue.put(key,value);
-            send.write("SUCCESS" + "\n");
-            send.flush();
+            if(!(nearest("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n"))).contains(name + " " + address))){
+                send.write("FAILED" + "\n");
+                send.flush();
+            }else {
+                String[] values = new String[Integer.parseInt(strings[2])];
+                for (int x = 0; x < Integer.parseInt(strings[2]); x++) {
+                    values[x] = recieve.readLine();
+                }
+                String value = String.join(" ", values);
+                //int distance = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(key)))
+                keyValue.put(key, value);
+                send.write("SUCCESS" + "\n");
+                send.flush();
+            }
         }catch(Exception e){
             System.out.println("error in store");
             throw new RuntimeException(e);
@@ -161,31 +176,44 @@ public class FullNode implements FullNodeInterface {
             throw new RuntimeException(e);
         }
     }
-    public void respondNotify(String s){
+    public void respondNotify(){
         try {
-            String n = recieve.readLine();
-            int x = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(name + "\n")), HashID.byteToHex(HashID.computeHashID(n + "\n")));
-            if(networkMap.get(x).size() > 3){
-                networkMap.get(x).add(String.join(" ", n, recieve.readLine()));
+            String name = recieve.readLine();
+            String address = recieve.readLine();
+            if(addNode(name,address)){
+                send.write("NOTIFIED");
+                send.flush();
             }
-            send.write("NOTIFIED");
-            send.flush();
         }catch(Exception e){
             System.out.println("error in Notify");
             throw new RuntimeException(e);
         }
     }
-    public void nearest(String key){
+    public String nearest(String msg){
         try {
-            String hashID = HashID.byteToHex(HashID.computeHashID(key + "\n"));
-            List near = new ArrayList<String>();
+            String hashID = msg.split(" ")[1];
+            ArrayList<String> ordered = new ArrayList<>();
+            System.out.println(networkMap.size());
             for (Integer distance : networkMap.keySet()) {
-                for (String s : networkMap.get(distance)){
-                    String[] node = s.split(" ");
-                    HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(node[0] + "\n")),HashID.byteToHex(HashID.computeHashID(key + "\n")));
+                for (String node : networkMap.get(distance)){
+                    String name = node.split(" ")[0];
+                    int d = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(name + "\n")),hashID);
+                    ordered.add(String.join(" ",String.valueOf(d) ,node));
                 }
             }
-        } catch (Exception e) {
+            Collections.sort(ordered, (s1, s2) -> {
+                int num1 = Integer.parseInt(s1.split(" ")[0]);
+                int num2 = Integer.parseInt(s2.split(" ")[0]);
+                return Integer.compare(num1, num2);
+            });
+            String[] nodes = new String[3];
+            for(int i = 0; i < 3;i++){
+                if(ordered.get(i) != null) {
+                    nodes[i] = ordered.get(i).split(" ", 2)[1];
+                }
+            }
+            return String.join(" ",nodes);
+            } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -195,11 +223,15 @@ public class FullNode implements FullNodeInterface {
 
 
 
-    public static void main(String[] args) {
-        FullNode f = new FullNode();
-        f.keyValue.put("hello there","does it work?");
-        f.listen("127.0.0.1",2345);
-        f.handleIncomingConnections("imranc@city.ac.uk","127.0.0.1:2345");
+    public static void main(String[] args) throws Exception {
+        FullNode fn1 = new FullNode();
+        fn1.addNode("imran:node-2","127.0.0.1:2345");
+        fn1.addNode("imran:node-3","127.0.0.1:3456");
+        fn1.addNode("imran:node-4","127.0.0.1:4567");
+        fn1.keyValue.put("hello there", "does it work?");
+        fn1.listen("127.0.0.1",1234);
+        fn1.handleIncomingConnections("imran:node-1","127.0.0.1:1234");
+
     }
     //test
 }

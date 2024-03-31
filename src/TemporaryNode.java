@@ -198,10 +198,10 @@ public class TemporaryNode implements TemporaryNodeInterface {
             System.out.println("connected");
         }
        if(tn.store("hello there","does it work?")){
-           System.out.println("it works");
+          System.out.println("it works");
         }
         //System.out.println(tn.getClosestNode("hello there"));
-        tn.get("hello there");
+        //tn.get("hello there");
         //tn.nearest("hello hello");
         tn.end();
     }

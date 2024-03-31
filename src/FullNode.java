@@ -141,7 +141,6 @@ public class FullNode implements FullNodeInterface {
                     values[x] = recieve.readLine();
                 }
                 String value = String.join(" ", values);
-                //int distance = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(key)))
                 keyValue.put(key, value);
                 send.write("SUCCESS" + "\n");
                 send.flush();

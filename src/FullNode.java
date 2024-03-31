@@ -53,7 +53,7 @@ public class FullNode implements FullNodeInterface {
         try {
             name = startingNodeName;
             address = startingNodeAddress;
-            addNode(name,address);
+
             if(!start){
                 respondStart();
                 connected = true;
@@ -110,7 +110,7 @@ public class FullNode implements FullNodeInterface {
         String msg = recieve.readLine();
         if(msg.startsWith("START")) {
             send =new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-            send.write("START " + 1 + name + "\n");
+            send.write("START " + 1 + " " + name + "\n");
             System.out.println("START " + 1 + name);
             send.flush();
             System.out.println("node connected");
@@ -183,7 +183,6 @@ public class FullNode implements FullNodeInterface {
             addNode(name,address);
             send.write("NOTIFIED");
             send.flush();
-
         }catch(Exception e){
             System.out.println("error in Notify");
             throw new RuntimeException(e);
@@ -217,8 +216,11 @@ public class FullNode implements FullNodeInterface {
             throw new RuntimeException(e);
         }
     }
-    public void notify(String nodeName,String nodeAddress){
-
+    public boolean notify(String nodeName,String nodeAddress) throws IOException {
+        send.write("NOTIFY" + "\n");
+        send.write(name + "\n");
+        send.write(address + "\n");
+        return Objects.equals(recieve.readLine(), "NOTIFIED");
     }
 
 
@@ -233,7 +235,6 @@ public class FullNode implements FullNodeInterface {
         //fn1.keyValue.put("hello there", "does it work?");
         fn1.listen("127.0.0.1",1234);
         fn1.handleIncomingConnections("imran:node-1","127.0.0.1:1234");
-
     }
     //test
 }

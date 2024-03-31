@@ -35,7 +35,9 @@ public class TemporaryNode implements TemporaryNodeInterface {
            send = new PrintWriter((new OutputStreamWriter(socket.getOutputStream())),true);
            send.write("START 1 "  + startingNodeName + "\n");
            send.flush();
+           System.out.println("START 1 "  + startingNodeName);
            String msg = recieve.readLine();
+           System.out.println(msg);
            if(!msg.startsWith("START")){
                send.close();
                recieve.close();
@@ -49,14 +51,14 @@ public class TemporaryNode implements TemporaryNodeInterface {
 	return true;
     }
     public boolean store(String key, String value) {
+        String[] nodes = nearest(key);
         if(storeValue(key,value)){
             return true;
         }
-        String[] nodes = nearest(key);
         System.out.println(Arrays.toString(nodes));
         end();
-        for(String s : nodes){
-            start("name",s);
+        for(int i = 0; i < nodes.length; i+=2){
+            start(nodes[i],nodes[i+1]);
             if(storeValue(key,value)){
                 return true;
             }
@@ -90,14 +92,14 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public String get(String key) {
         try {
-            String[] nodes = nearest(key);
             String value = getValue(key);
             if(value != null){
                 return value;
             }
+            String[] nodes = nearest(key);
             end();
-            for(String s : nodes){
-                start("name",s);
+            for(int i = 0; i < nodes.length; i+=2){
+                start(nodes[i],nodes[i+1]);
                 value = getValue(key);
                 if(value != null){
                     return value;
@@ -150,15 +152,12 @@ public class TemporaryNode implements TemporaryNodeInterface {
                 return null;
             }
             System.out.println(response[0] + " " + response[1]);
-            String[] addrs = new String[Integer.parseInt(response[1])];
-            String[] names = new String[Integer.parseInt(response[1])];
-            for (int i = 0; i < Integer.parseInt(response[1]); i++) {
-                names[i] = recieve.readLine();
-                addrs[i] = recieve.readLine();
-                System.out.println(names[i]);
-                System.out.println(addrs[i]);
+            String[] nodes = new String[Integer.parseInt(response[1]) * 2];
+            for (int i = 0; i < Integer.parseInt(response[1]) * 2; i++) {
+                nodes[i] = recieve.readLine();
+                System.out.println(nodes[i]);
             }
-            return addrs;
+            return nodes;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println("ERROR in Nearest method");
@@ -197,11 +196,11 @@ public class TemporaryNode implements TemporaryNodeInterface {
         if(tn.start("string","127.0.0.1:1234")){
             System.out.println("connected");
         }
-       if(tn.store("hello there","does it work?")){
-          System.out.println("it works");
-        }
+       //if(tn.store("hello there","does it work?")){
+         // System.out.println("it works");
+       // }
         //System.out.println(tn.getClosestNode("hello there"));
-        //tn.get("hello there");
+        tn.get("hello there");
         //tn.nearest("hello hello");
         tn.end();
     }

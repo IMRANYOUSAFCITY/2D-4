@@ -24,7 +24,7 @@ interface FullNodeInterface {
 public class FullNode implements FullNodeInterface {
     String name;
     String address;
-    Map<Integer, List<String>> networkMap = new HashMap<>();
+    HashMap<Integer, List<String>> networkMap = new HashMap<>();
 
     HashMap<String, String> keyValue = new HashMap<String, String>();
     ServerSocket serverSocket;
@@ -53,8 +53,7 @@ public class FullNode implements FullNodeInterface {
         try {
             name = startingNodeName;
             address = startingNodeAddress;
-            networkMap.put(0,new ArrayList<>());
-            networkMap.get(0).add(String.join(" ", name, address));
+            addNode(name,address);
             if(!start){
                 respondStart();
                 connected = true;
@@ -92,15 +91,17 @@ public class FullNode implements FullNodeInterface {
         }
 	// Implement this!
     }
-    public boolean addNode(String nodeName,String nodeAddress) throws Exception {
+    public void addNode(String nodeName,String nodeAddress) throws Exception {
         int x = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(nodeName + "\n")),HashID.byteToHex(HashID.computeHashID(nodeAddress + "\n")));
-        if(!networkMap.containsKey(x)){
-            networkMap.put(x,new ArrayList<>());
-        } else if(networkMap.get(x).size() == 3){
-            networkMap.get(x).remove(2);
+        if (!networkMap.containsKey(x)) {
+            networkMap.put(x, new ArrayList<>());
         }
-        networkMap.get(x).add(String.join(" ", nodeName, nodeAddress));
-        return true;
+        if (!networkMap.get(x).contains(String.join(" ",nodeName,nodeAddress))) {
+            if (networkMap.get(x).size() == 3) {
+                networkMap.get(x).remove(2);
+            }
+            networkMap.get(x).add(String.join(" ", nodeName, nodeAddress));
+        }
     }
     public void respondStart(){
         try{
@@ -180,10 +181,10 @@ public class FullNode implements FullNodeInterface {
         try {
             String name = recieve.readLine();
             String address = recieve.readLine();
-            if(addNode(name,address)){
-                send.write("NOTIFIED");
-                send.flush();
-            }
+            addNode(name,address);
+            send.write("NOTIFIED");
+            send.flush();
+
         }catch(Exception e){
             System.out.println("error in Notify");
             throw new RuntimeException(e);
@@ -225,10 +226,12 @@ public class FullNode implements FullNodeInterface {
 
     public static void main(String[] args) throws Exception {
         FullNode fn1 = new FullNode();
+        fn1.addNode("imran:node-1","127.0.0.1:1234");
         fn1.addNode("imran:node-2","127.0.0.1:2345");
         fn1.addNode("imran:node-3","127.0.0.1:3456");
         fn1.addNode("imran:node-4","127.0.0.1:4567");
-        fn1.keyValue.put("hello there", "does it work?");
+        fn1.addNode("imran:node-5","127.0.0.1:5678");
+        //fn1.keyValue.put("hello there", "does it work?");
         fn1.listen("127.0.0.1",1234);
         fn1.handleIncomingConnections("imran:node-1","127.0.0.1:1234");
 

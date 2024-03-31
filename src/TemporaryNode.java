@@ -182,102 +182,24 @@ public class TemporaryNode implements TemporaryNodeInterface {
     }
     public void end(){
         try{
-        send.write("END " + "stop");
+        send.write("END " + "stop" + "\n");
         send.flush();
         socket.close();
     } catch (IOException e) {
         System.out.println(e.getMessage());
-        System.out.println("ERROR in Nearest method");
+        System.out.println("ERROR in END method");
     }
     }
-
-    /*
-    public String get(String key) {
-        try {
-           String value = getValue(key);
-            if(value != null){
-                return value;
-            }
-            String[] nodes = nearest(key);
-            end();
-            for(String s : nodes){
-                start("name",s);
-                value = getValue(key);
-                if(value != null){
-                    return value;
-                }
-                end();
-            }
-            return null;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-    public String getValue(String key){
-        try{
-            String[] keys = key.split(" ");
-            if (keys.length == 0) {
-                return null;
-            }
-            send.write("GET? " + keys.length + "\n");
-            System.out.println("GET? " + keys.length);
-            for (String s : keys) {
-                send.write(s + "\n");
-                System.out.println(s);
-            }
-            send.flush();
-            String[] responses = recieve.readLine().split(" ");
-            if (Objects.equals(responses[0], "VALUE")) {
-                System.out.println(responses[0] + " " + responses[1]);
-                String value = "";
-                for (int i = 0; i < Integer.parseInt(responses[1]); i++) {
-                    value += recieve.readLine();
-                    System.out.println(value);
-                }
-                return value;
-            }
-            System.out.println(responses[0]);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            System.out.println("ERROR in GetValue node");
-            return null;
-        }
-        return null;
-    }
-    public String[] nearest(String key) {
-        try{
-            send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n"))+"\n");
-            System.out.println("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n")));
-            send.flush();
-            if(!recieve.readLine().startsWith("NODES")){
-                return null;
-            }
-            String[] addrs = new String[3];
-            String[] names = new String[3];
-            for (int i = 0; i < 3; i++) {
-                names[i] = recieve.readLine();
-                addrs[i] = recieve.readLine();
-                System.out.println(names[i]);
-                System.out.println(addrs[i]);
-            }
-            return addrs;
-            } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.out.println("ERROR in Nearest method");
-            return null;
-        }
-     }
-    */
 
 
     public static void main(String[] args) throws Exception {
         TemporaryNode tn = new TemporaryNode();
-        if(tn.start("imran:node-1","127.0.0.1:4567")){
+        if(tn.start("string","127.0.0.1:1234")){
             System.out.println("connected");
         }
-       //if(tn.store("hello there","does it work?")){
-         //  System.out.println("it works");
-        //}
+       if(tn.store("hello there","does it work?")){
+           System.out.println("it works");
+        }
         //System.out.println(tn.getClosestNode("hello there"));
         tn.get("hello there");
         //tn.nearest("hello hello");

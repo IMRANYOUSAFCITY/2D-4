@@ -92,11 +92,11 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public String get(String key) {
         try {
+            String[] nodes = nearest(key);
             String value = getValue(key);
             if(value != null){
                 return value;
             }
-            String[] nodes = nearest(key);
             end();
             for(int i = 0; i < nodes.length; i+=2){
                 start(nodes[i],nodes[i+1]);

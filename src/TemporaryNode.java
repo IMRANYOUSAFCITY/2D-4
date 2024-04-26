@@ -93,6 +93,8 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public String get(String key) {
         try {
+            System.out.println(HashID.byteToHex(HashID.computeHashID(key)));
+            System.out.println(HashID.byteToHex(HashID.computeHashID(key + "\n" + "\n")));
             String[] nodes = nearest(key);
             String value = getValue(key);
             if(value != null){
@@ -216,11 +218,11 @@ public class TemporaryNode implements TemporaryNodeInterface {
         if(tn.start("string","127.0.0.1:5678")){
             System.out.println("connected");
         }
-       if(tn.store("hello there","does it work?")){
-          System.out.println("it works");
-        }
+       //if(tn.store("hello there","does it work?")){
+         // System.out.println("it works");
+        //}
         //System.out.println(tn.getClosestNode("hello there"));
-        //tn.get("hello there");
+        tn.get("test/jabberwocky/4");
         //tn.nearest("hello hello");
         tn.end();
     }

@@ -32,7 +32,7 @@ public class CmdLineFullNode {
 
 	    
             // Use a FullNode object to be a full participant in the 2D#4 network
-            FullNode fn = new FullNode();
+            FullNode fn = new FullNode(); 
 
 	    // Full nodes need to be able to accept incoming connections
 	    if (fn.listen(ipAddress, portNumber)) {

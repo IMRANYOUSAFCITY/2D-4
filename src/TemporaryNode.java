@@ -9,7 +9,6 @@
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -33,9 +32,11 @@ public class TemporaryNode implements TemporaryNodeInterface {
            socket = new Socket(addrs[0],Integer.parseInt(addrs[1]));
            recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
            send = new PrintWriter((new OutputStreamWriter(socket.getOutputStream())),true);
-           send.write("START 1 "  + startingNodeName + "\n");
+           long t = System.currentTimeMillis();
+           String name = t+"";
+           send.write("START 1 "  + name + "\n");
            send.flush();
-           System.out.println("START 1 "  + startingNodeName);
+           System.out.println("START 1 "  + name);
            String msg = recieve.readLine();
            System.out.println(msg);
            if(!msg.startsWith("START")){
@@ -144,7 +145,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
     }
     public String[] nearest(String key) {
         try{
-            send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n"))+"\n");
+            send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key))+"\n");
             System.out.println("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n")));
             send.flush();
             String[] response = recieve.readLine().split(" ");
@@ -172,7 +173,26 @@ public class TemporaryNode implements TemporaryNodeInterface {
             if(!recieve.readLine().startsWith("NODES")){
                 return null;
             }
-            return String.join(" ",recieve.readLine(),recieve.readLine());
+            String closestName = recieve.readLine();
+            String closestAddress = recieve.readLine();
+            while (true){
+                end();
+                start(closestName,closestAddress);
+                send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n"))+"\n");
+                send.flush();
+                if(!recieve.readLine().startsWith("NODES")){
+                    return null;
+                }
+                String nearName = recieve.readLine();
+                String nearAddress = recieve.readLine();
+                if(Objects.equals(nearName, closestName) && Objects.equals(nearAddress, closestAddress)){
+                    end();
+                    return String.join(" ",closestName,closestAddress);
+                }else {
+                    closestName = nearName;
+                    closestAddress = nearAddress;
+                }
+            }
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println("ERROR in Nearest method");
@@ -191,16 +211,16 @@ public class TemporaryNode implements TemporaryNodeInterface {
     }
 
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         TemporaryNode tn = new TemporaryNode();
-        if(tn.start("string","127.0.0.1:1234")){
+        if(tn.start("string","127.0.0.1:5678")){
             System.out.println("connected");
         }
-       //if(tn.store("hello there","does it work?")){
-         // System.out.println("it works");
-       // }
+       if(tn.store("hello there","does it work?")){
+          System.out.println("it works");
+        }
         //System.out.println(tn.getClosestNode("hello there"));
-        tn.get("hello there");
+        //tn.get("hello there");
         //tn.nearest("hello hello");
         tn.end();
     }

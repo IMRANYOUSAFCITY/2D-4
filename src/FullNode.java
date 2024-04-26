@@ -30,7 +30,7 @@ public class FullNode implements FullNodeInterface {
     ServerSocket serverSocket;
     Socket clientSocket;
     BufferedReader recieve;
-    BufferedWriter send;
+    PrintWriter send;
     boolean connected = false;
     boolean start = false;
     public boolean listen(String ipAddress, int portNumber) {
@@ -49,7 +49,7 @@ public class FullNode implements FullNodeInterface {
 	return true;
     }
     
-    public void handleIncomingConnections(String startingNodeName, String startingNodeAddress) {
+    public void handleIncomingConnections(String startingNodeName, String startingNodeAddress) { // first point of contact in network
         try {
             name = startingNodeName;
             address = startingNodeAddress;
@@ -103,13 +103,41 @@ public class FullNode implements FullNodeInterface {
             networkMap.get(x).add(String.join(" ", nodeName, nodeAddress));
         }
     }
+
+    public boolean start(String connectingNodeName,String connectingNodeAddress){
+        System.out.println("Temporary Node connecting to " +  connectingNodeName);
+        String[] addrs = connectingNodeAddress.split(":");
+        try {
+            Socket socket = new Socket(addrs[0],Integer.parseInt(addrs[1]));
+            recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            send = new PrintWriter((new OutputStreamWriter(socket.getOutputStream())),true);
+            send.write("START 1 "  + name + "\n");
+            send.flush();
+            System.out.println("START 1 "  + name);
+            String msg = recieve.readLine();
+            System.out.println(msg);
+            if(!msg.startsWith("START")){
+                send.close();
+                recieve.close();
+                socket.close();
+                return false;
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+
+
     public void respondStart(){
         try{
         clientSocket = serverSocket.accept();
         recieve = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         String msg = recieve.readLine();
         if(msg.startsWith("START")) {
-            send =new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+            send =new PrintWriter((new OutputStreamWriter(clientSocket.getOutputStream())));
             send.write("START " + 1 + " " + name + "\n");
             System.out.println("START " + 1 + name);
             send.flush();
@@ -233,8 +261,8 @@ public class FullNode implements FullNodeInterface {
         fn1.addNode("imran:node-4","127.0.0.1:4567");
         fn1.addNode("imran:node-5","127.0.0.1:5678");
         //fn1.keyValue.put("hello there", "does it work?");
-        fn1.listen("127.0.0.1",1234);
-        fn1.handleIncomingConnections("imran:node-1","127.0.0.1:1234");
+        fn1.listen("127.0.0.1",5678);
+        fn1.handleIncomingConnections("imran:node-1","127.0.0.1:5678");
     }
     //test
 }

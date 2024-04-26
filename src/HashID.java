@@ -11,7 +11,7 @@ import java.security.NoSuchAlgorithmException;
 public class HashID {
 
 	public static byte[] computeHashID(String line) throws Exception {
-		if(!(line.endsWith("\n"))){
+		if(!line.endsWith("\n")){
 			line += "\n";
 		}
 		if (line.endsWith("\n")) {

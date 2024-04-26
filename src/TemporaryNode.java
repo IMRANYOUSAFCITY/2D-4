@@ -146,7 +146,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
     public String[] nearest(String key) {
         try{
             send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key))+"\n");
-            System.out.println("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n")));
+            System.out.println("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key)));
             send.flush();
             String[] response = recieve.readLine().split(" ");
             if(!(Objects.equals(response[0], "NODES"))){
@@ -167,7 +167,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
     }
     public String getClosestNode(String key) {
         try{
-            send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n"))+"\n");
+            send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key))+"\n");
             //System.out.println("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n")));
             send.flush();
             if(!recieve.readLine().startsWith("NODES")){
@@ -178,7 +178,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
             while (true){
                 end();
                 start(closestName,closestAddress);
-                send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n"))+"\n");
+                send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key))+"\n");
                 send.flush();
                 if(!recieve.readLine().startsWith("NODES")){
                     return null;

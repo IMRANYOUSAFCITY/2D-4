@@ -93,6 +93,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public String get(String key) {
         try {
+
             System.out.println(HashID.byteToHex(HashID.computeHashID(key)));
             System.out.println(HashID.byteToHex(HashID.computeHashID(key + "\n" + "\n")));
             String[] nodes = nearest(key);

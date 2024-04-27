@@ -45,6 +45,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
+            end();
             return false;
         }
         return true;
@@ -84,7 +85,8 @@ public class TemporaryNode implements TemporaryNodeInterface {
             System.out.println(response);
             return Objects.equals(response, "SUCCESS");
         } catch (IOException e) {
-            System.out.println("error in temp");
+            System.out.println(e.getMessage());
+            end();
             return false;
         }
     }
@@ -104,10 +106,17 @@ public class TemporaryNode implements TemporaryNodeInterface {
                     return value;
                 }
                 end();
+              /*  if(i == nodes.length-2){
+                    get(key);
+                }else {
+                    end();
+                } */
             }
             return null;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
+            end();
+            return null;
         }
     }
     public String getValue(String key){
@@ -136,7 +145,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
             System.out.println(responses[0]);
         } catch (IOException e) {
             System.out.println(e.getMessage());
-            System.out.println("ERROR in GetValue node");
+            end();
             return null;
         }
         return null;
@@ -159,14 +168,14 @@ public class TemporaryNode implements TemporaryNodeInterface {
             return nodes;
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            System.out.println("ERROR in Nearest method");
+            end();
             return null;
         }
     }
     public String getClosestNode(String key) {
         try{
-            send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n"))+"\n");
-            //System.out.println("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n")));
+            send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key))+"\n");
+            System.out.println("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key)));
             send.flush();
             if(!recieve.readLine().startsWith("NODES")){
                 return null;
@@ -174,7 +183,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
             return String.join(" ",recieve.readLine(),recieve.readLine());
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            System.out.println("ERROR in Nearest method");
+            end();
             return null;
         }
     }
@@ -185,7 +194,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
             socket.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
-            System.out.println("ERROR in END method");
+            end();
         }
     }
 

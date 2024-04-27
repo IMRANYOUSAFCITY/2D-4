@@ -171,7 +171,7 @@ public class FullNode implements FullNodeInterface {
                 keys[x] = recieve.readLine();
             }
             String key = String.join(" ",keys);
-            if(!(nearest("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key))).contains(startingName + " " + startingAddress))){
+            if(!(nearest("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key+"\n"))).contains(startingName + " " + startingAddress))){
                 send.write("FAILED" + "\n");
                 send.flush();
             }else {
@@ -236,7 +236,7 @@ public class FullNode implements FullNodeInterface {
             for (Integer distance : networkMap.keySet()) {
                 for (String node : networkMap.get(distance)){
                     String name = node.split(" ")[0];
-                    int d = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(name)),hashID);
+                    int d = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(name+"\n")),hashID);
                     ordered.add(String.join(" ",String.valueOf(d) ,node));
                 }
             }

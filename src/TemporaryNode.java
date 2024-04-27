@@ -103,7 +103,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
                 if(value != null){
                     return value;
                 }
-                if(i == nodes.length){
+                if(nodes[i] == nodes[nodes.length-2] && nodes[i+1] == nodes[nodes.length -1]){
                     get(key);
                 }else {
                     end();

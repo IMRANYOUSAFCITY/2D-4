@@ -103,7 +103,7 @@ public class FullNode implements FullNodeInterface {
 	// Implement this!
     }
     public void addNode(String nodeName,String nodeAddress) throws Exception {
-        int x = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(nodeName + "\n")),HashID.byteToHex(HashID.computeHashID(nodeAddress + "\n")));
+        int x = HashID.calculateDistance(HashID.byteToHex(nodeName + "\n"),HashID.byteToHex(nodeAddress + "\n"));
         if (!networkMap.containsKey(x)) {
             networkMap.put(x, new ArrayList<>());
         }
@@ -171,7 +171,7 @@ public class FullNode implements FullNodeInterface {
                 keys[x] = recieve.readLine();
             }
             String key = String.join(" ",keys);
-            if(!(nearest("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key))).contains(startingName + " " + startingAddress))){
+            if(!(nearest("NEAREST? " + HashID.byteToHex(key)).contains(startingName + " " + startingAddress))){
                 send.write("FAILED" + "\n");
                 send.flush();
             }else {
@@ -236,7 +236,7 @@ public class FullNode implements FullNodeInterface {
             for (Integer distance : networkMap.keySet()) {
                 for (String node : networkMap.get(distance)){
                     String name = node.split(" ")[0];
-                    int d = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(name)),hashID);
+                    int d = HashID.calculateDistance(HashID.byteToHex(name),hashID);
                     ordered.add(String.join(" ",String.valueOf(d) ,node));
                 }
             }

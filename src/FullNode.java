@@ -57,6 +57,11 @@ public class FullNode implements FullNodeInterface {
     
     public void handleIncomingConnections(String startingNodeName, String startingNodeAddress) { // first point of contact in network
         try {
+            addNode("imran:node-1","127.0.0.1:1234");
+            addNode("imran:node-2","127.0.0.1:2345");
+            addNode("imran:node-3","127.0.0.1:3456");
+            addNode("imran:node-4","127.0.0.1:4567");
+            addNode("imran:node-5","127.0.0.1:5678");
             startingName = startingNodeName;
             startingAddress = startingNodeAddress;
             if(!start){
@@ -273,11 +278,11 @@ public class FullNode implements FullNodeInterface {
 
     public static void main(String[] args) throws Exception {
         FullNode fn1 = new FullNode();
-        fn1.addNode("imran:node-1","127.0.0.1:1234");
-        fn1.addNode("imran:node-2","127.0.0.1:2345");
-        fn1.addNode("imran:node-3","127.0.0.1:3456");
-        fn1.addNode("imran:node-4","127.0.0.1:4567");
-        fn1.addNode("imran:node-5","127.0.0.1:5678");
+      //  fn1.addNode("imran:node-1","127.0.0.1:1234");
+      //  fn1.addNode("imran:node-2","127.0.0.1:2345");
+       // fn1.addNode("imran:node-3","127.0.0.1:3456");
+       // fn1.addNode("imran:node-4","127.0.0.1:4567");
+       // fn1.addNode("imran:node-5","127.0.0.1:5678");
         //fn1.keyValue.put("hello there", "does it work?");
         fn1.listen("127.0.0.1",1234);
         fn1.handleIncomingConnections("imran:node-1","127.0.0.1:1234");

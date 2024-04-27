@@ -103,7 +103,11 @@ public class TemporaryNode implements TemporaryNodeInterface {
                 if(value != null){
                     return value;
                 }
-                end();
+                if(i == nodes.length-2){
+                    get(key);
+                }else {
+                    end();
+                }
             }
             return null;
         } catch (Exception e) {
@@ -165,7 +169,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
     }
     public String getClosestNode(String key) {
         try{
-            send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key))+"\n");
+            send.write("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n"))+"\n");
             //System.out.println("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n")));
             send.flush();
             if(!recieve.readLine().startsWith("NODES")){

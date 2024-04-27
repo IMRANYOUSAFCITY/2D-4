@@ -104,8 +104,13 @@ public class TemporaryNode implements TemporaryNodeInterface {
                 if(value != null){
                     return value;
                 }
-                end();
+                if(i == nodes.length){
+                    get(key);
+                }else {
+                    end();
+                }
             }
+
             return null;
         } catch (Exception e) {
             throw new RuntimeException(e);

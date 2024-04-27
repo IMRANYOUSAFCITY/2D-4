@@ -76,7 +76,7 @@ public class FullNode implements FullNodeInterface {
                     put(msg);
                 } else if (msg.startsWith("GET?")) {
                     get(msg);
-                } else if (msg.startsWith("NOTIFY")) {
+                } else if (msg.startsWith("NOTIFY?")) {
                     respondNotify();
                 } else if (msg.startsWith("NEAREST?")) {
                     String[] nodes = nearest(msg).split(" ");
@@ -87,7 +87,7 @@ public class FullNode implements FullNodeInterface {
                         System.out.println(s);
                     }
                     send.flush();
-                } else if (msg.startsWith("ECHO")) {
+                } else if (msg.startsWith("ECHO?")) {
                     send.write("OCHE" + "\n");
                     send.flush();
                 } else if (msg.startsWith("END")) {
@@ -109,7 +109,7 @@ public class FullNode implements FullNodeInterface {
         }
         if (!networkMap.get(x).contains(String.join(" ",nodeName,nodeAddress))) {
             if (networkMap.get(x).size() == 3) {
-                networkMap.get(x).remove(2);
+                networkMap.get(x).remove(0);
             }
             networkMap.get(x).add(String.join(" ", nodeName, nodeAddress));
         }

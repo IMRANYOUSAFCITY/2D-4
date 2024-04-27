@@ -213,14 +213,14 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public static void main(String[] args) {
         TemporaryNode tn = new TemporaryNode();
-        if(tn.start("string","127.0.0.1:5678")){
+        if(tn.start("string","127.0.0.1:1234")){
             System.out.println("connected");
         }
-       //if(tn.store("hello there","does it work?")){
-         // System.out.println("it works");
-        //}
-        //System.out.println(tn.getClosestNode("hello there"));
-        tn.get("test/jabberwocky/4");
+       if(tn.store("test/jabberwocky/4","does it work?")){
+          System.out.println("it works");
+        }
+        System.out.println(tn.getClosestNode("hello there"));
+        //tn.get("test/jabberwocky/4");
         //tn.nearest("hello hello");
         tn.end();
     }

@@ -63,7 +63,8 @@ public class FullNode implements FullNodeInterface {
                 if(!(String.join(":", ip, String.valueOf(port)).equals(startingAddress))) {
                     System.out.println(start(startingName, startingAddress));
                     System.out.println(notify(startingName, startingAddress));
-                    send.write("END notified");
+                    //send.write("END notified" + "\n");
+                    //send.flush();
                 }
                 respondStart();
                 connected = true;

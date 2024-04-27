@@ -22,19 +22,25 @@ interface FullNodeInterface {
 
 
 public class FullNode implements FullNodeInterface {
-    String name;
-    String address;
+    String startingName;
+    String startingAddress;
+    String ip;
+    int port;
     HashMap<Integer, List<String>> networkMap = new HashMap<>();
 
-    HashMap<String, String> keyValue = new HashMap<String, String>();
+    HashMap<String, String> keyValue = new HashMap<>();
     ServerSocket serverSocket;
     Socket clientSocket;
+    Socket ssocket;
     BufferedReader recieve;
     PrintWriter send;
     boolean connected = false;
     boolean start = false;
+
     public boolean listen(String ipAddress, int portNumber) {
         try {
+            ip = ipAddress;
+            port = portNumber;
             System.out.println("Opening the server socket on port " + portNumber);
             serverSocket = new ServerSocket(portNumber);
             System.out.println("Server waiting for client...");
@@ -51,10 +57,14 @@ public class FullNode implements FullNodeInterface {
     
     public void handleIncomingConnections(String startingNodeName, String startingNodeAddress) { // first point of contact in network
         try {
-            name = startingNodeName;
-            address = startingNodeAddress;
-
+            startingName = startingNodeName;
+            startingAddress = startingNodeAddress;
             if(!start){
+                if(!(String.join(":", ip, String.valueOf(port)).equals(startingAddress))) {
+                    System.out.println(start(startingName, startingAddress));
+                    System.out.println(notify(startingName, startingAddress));
+                    send.write("END notified");
+                }
                 respondStart();
                 connected = true;
             }
@@ -105,21 +115,21 @@ public class FullNode implements FullNodeInterface {
     }
 
     public boolean start(String connectingNodeName,String connectingNodeAddress){
-        System.out.println("Temporary Node connecting to " +  connectingNodeName);
+        System.out.println("Full Node connecting to " +  connectingNodeName);
         String[] addrs = connectingNodeAddress.split(":");
         try {
-            Socket socket = new Socket(addrs[0],Integer.parseInt(addrs[1]));
-            recieve = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            send = new PrintWriter((new OutputStreamWriter(socket.getOutputStream())),true);
-            send.write("START 1 "  + name + "\n");
+            ssocket = new Socket(addrs[0],Integer.parseInt(addrs[1]));
+            recieve = new BufferedReader(new InputStreamReader(ssocket.getInputStream()));
+            send = new PrintWriter((new OutputStreamWriter(ssocket.getOutputStream())),true);
+            send.write("START 1 " + startingName + "\n");
             send.flush();
-            System.out.println("START 1 "  + name);
+            System.out.println("START 1 "  + startingName);
             String msg = recieve.readLine();
             System.out.println(msg);
             if(!msg.startsWith("START")){
                 send.close();
                 recieve.close();
-                socket.close();
+                ssocket.close();
                 return false;
             }
         } catch (IOException e) {
@@ -138,8 +148,8 @@ public class FullNode implements FullNodeInterface {
         String msg = recieve.readLine();
         if(msg.startsWith("START")) {
             send =new PrintWriter((new OutputStreamWriter(clientSocket.getOutputStream())));
-            send.write("START " + 1 + " " + name + "\n");
-            System.out.println("START " + 1 + name);
+            send.write("START " + 1 + " " + startingName + "\n");
+            System.out.println("START " + 1 + startingName);
             send.flush();
             System.out.println("node connected");
             start = true;
@@ -160,7 +170,7 @@ public class FullNode implements FullNodeInterface {
                 keys[x] = recieve.readLine();
             }
             String key = String.join(" ",keys);
-            if(!(nearest("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key + "\n"))).contains(name + " " + address))){
+            if(!(nearest("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key))).contains(startingName + " " + startingAddress))){
                 send.write("FAILED" + "\n");
                 send.flush();
             }else {
@@ -209,8 +219,9 @@ public class FullNode implements FullNodeInterface {
             String name = recieve.readLine();
             String address = recieve.readLine();
             addNode(name,address);
-            send.write("NOTIFIED");
+            send.write("NOTIFIED" + "\n");
             send.flush();
+            System.out.println("NOTIFIED");
         }catch(Exception e){
             System.out.println("error in Notify");
             throw new RuntimeException(e);
@@ -224,7 +235,7 @@ public class FullNode implements FullNodeInterface {
             for (Integer distance : networkMap.keySet()) {
                 for (String node : networkMap.get(distance)){
                     String name = node.split(" ")[0];
-                    int d = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(name + "\n")),hashID);
+                    int d = HashID.calculateDistance(HashID.byteToHex(HashID.computeHashID(name)),hashID);
                     ordered.add(String.join(" ",String.valueOf(d) ,node));
                 }
             }
@@ -246,9 +257,15 @@ public class FullNode implements FullNodeInterface {
     }
     public boolean notify(String nodeName,String nodeAddress) throws IOException {
         send.write("NOTIFY" + "\n");
-        send.write(name + "\n");
-        send.write(address + "\n");
-        return Objects.equals(recieve.readLine(), "NOTIFIED");
+        System.out.println("NOTIFY");
+        send.write(startingName + "\n");
+        System.out.println(startingName);
+        send.write(startingAddress + "\n");
+        System.out.println(startingAddress);
+        send.flush();
+        String response = recieve.readLine();
+        System.out.println(response);
+        return Objects.equals(response, "NOTIFIED");
     }
 
 
@@ -261,8 +278,8 @@ public class FullNode implements FullNodeInterface {
         fn1.addNode("imran:node-4","127.0.0.1:4567");
         fn1.addNode("imran:node-5","127.0.0.1:5678");
         //fn1.keyValue.put("hello there", "does it work?");
-        fn1.listen("127.0.0.1",5678);
-        fn1.handleIncomingConnections("imran:node-1","127.0.0.1:5678");
+        fn1.listen("127.0.0.1",1234);
+        fn1.handleIncomingConnections("imran:node-1","127.0.0.1:1234");
     }
     //test
 }

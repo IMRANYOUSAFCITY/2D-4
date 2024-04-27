@@ -11,9 +11,9 @@ import java.security.NoSuchAlgorithmException;
 public class HashID {
 
 	public static byte[] computeHashID(String line) throws Exception {
-		//if(!line.endsWith("\n")){
-		//	line += "\n";
-		//}
+		if(!line.endsWith("\n")){
+			line += "\n";
+		}
 		if (line.endsWith("\n")) {
 			// What this does and how it works is covered in a later lecture
 			MessageDigest md = MessageDigest.getInstance("SHA-256");

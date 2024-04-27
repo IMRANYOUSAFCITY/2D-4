@@ -262,8 +262,8 @@ public class FullNode implements FullNodeInterface {
         }
     }
     public boolean notify(String nodeName,String nodeAddress) throws IOException {
-        send.write("NOTIFY" + "\n");
-        System.out.println("NOTIFY");
+        send.write("NOTIFY?" + "\n");
+        System.out.println("NOTIFY?");
         send.write(startingName + "\n");
         System.out.println(startingName);
         send.write(startingAddress + "\n");

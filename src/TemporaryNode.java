@@ -200,7 +200,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public static void main(String[] args) throws Exception {
         TemporaryNode tn = new TemporaryNode();
-        if(tn.start("string","127.0.0.1:1234")){
+        if(tn.start("imran:node-1","127.0.0.1:1234")){
             System.out.println("connected");
         }
         //if(tn.store("hello there","does it work?")){

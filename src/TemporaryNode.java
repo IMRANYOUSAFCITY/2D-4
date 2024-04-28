@@ -200,16 +200,17 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     public static void main(String[] args) throws Exception {
         TemporaryNode tn = new TemporaryNode();
-        if(tn.start("imran:node-1","127.0.0.1:1234")){
+        if(tn.start("imranc@city.ac.uk:1234","127.0.0.1:1234")){
             System.out.println("connected");
         }
-        if(tn.store("hello there","does it work?")){
-         System.out.println("it works");
-         }
+        //if(tn.store("hello there","does it work?")){
+         //System.out.println("it works");
+         //}
         //System.out.println(tn.getClosestNode("hello there"));
         //tn.get("test/jabberwocky/4" + "\n");
         //tn.findClosestNode("hello");
         //tn.nearest("hello hello");
+        tn.storeValue("hello","hi");
         tn.end();
     }
 }

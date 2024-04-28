@@ -172,9 +172,11 @@ public class FullNode implements FullNodeInterface {
                 keys[x] = recieve.readLine();
             }
             String key = String.join(" ",keys);
-            if(!(nearest("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key))).contains(startingName + " " + startingAddress))){
-                send.write("FAILED" + "\n");
-                send.flush();
+            if(!(networkMap.size() < 4)) {
+                if (!(nearest("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key))).contains(startingName + " " + startingAddress))) {
+                    send.write("FAILED" + "\n");
+                    send.flush();
+                }
             }else {
                 String[] values = new String[Integer.parseInt(strings[2])];
                 for (int x = 0; x < Integer.parseInt(strings[2]); x++) {
@@ -289,7 +291,7 @@ public class FullNode implements FullNodeInterface {
        // fn1.addNode("imran:node-5","127.0.0.1:5678");
         //fn1.keyValue.put("hello there", "does it work?");
         fn1.listen("127.0.0.1",1234);
-        fn1.handleIncomingConnections("imran:node-1","127.0.0.1:1234");
+        fn1.handleIncomingConnections("imran@city.ac.uk:1234","127.0.0.1:2345");
     }
     //test
 }

@@ -208,8 +208,8 @@ public class TemporaryNode implements TemporaryNodeInterface {
         // }
         //System.out.println(tn.getClosestNode("hello there"));
         //tn.get("test/jabberwocky/4" + "\n");
-        tn.findClosestNode("hello",null);
-        //tn.nearest("hello hello");
+        //tn.findClosestNode("hello",null);
+        tn.nearest("hello hello");
         tn.end();
     }
 }

@@ -247,8 +247,16 @@ public class FullNode implements FullNodeInterface {
                 int num2 = Integer.parseInt(s2.split(" ")[0]);
                 return Integer.compare(num1, num2);
             });
-            String[] nodes = new String[3];
-            for(int i = 0; i < 3;i++){
+            int size = 0;
+            if(ordered.size() >= 3){
+                size = 3;
+            }else if(ordered.size() == 2){
+                size = 2;
+            }else if(ordered.size() == 1){
+                size = 1;
+            }
+            String[] nodes = new String[size];
+            for(int i = 0; i < size;i++){
                 if(ordered.get(i) != null) {
                     nodes[i] = ordered.get(i).split(" ", 2)[1];
                 }

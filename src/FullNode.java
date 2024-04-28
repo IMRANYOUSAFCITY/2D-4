@@ -57,11 +57,8 @@ public class FullNode implements FullNodeInterface {
     
     public void handleIncomingConnections(String startingNodeName, String startingNodeAddress) { // first point of contact in network
         try {
-            addNode("imran:node-1","127.0.0.1:1234");
-            addNode("imran:node-2","127.0.0.1:2345");
-            addNode("imran:node-3","127.0.0.1:3456");
-            addNode("imran:node-4","127.0.0.1:4567");
-            addNode("imran:node-5","127.0.0.1:5678");
+            String randomName = String.valueOf(System.currentTimeMillis());
+            addNode(randomName,String.join(":",ip,String.valueOf(port)));
             startingName = startingNodeName;
             startingAddress = startingNodeAddress;
             if(!start){

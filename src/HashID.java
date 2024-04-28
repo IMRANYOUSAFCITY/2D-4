@@ -89,6 +89,6 @@ public class HashID {
 		System.out.println(HashID.otherhash("test/jabberwocky/1"));
 		System.out.println(calculateDistance("0f033be6cea034bd45a0352775a219ef5dc7825ce55d1f7dae9762d80ce64411","0f0139b167bb7b4a416b8f6a7e0daa7e24a08172b9892171e5fdc615bb7f999b"));
 		System.out.println(HashID.byteToHex(HashID.computeHashID("martin.brain@city.ac.uk:Martins-implementation-1.0,fullNode-20010" + "\n")));
-		System.out.println(HashID.byteToHex(HashID.computeHashID("test/jabberwocky/4" + "\n"))+"\n");
+		System.out.println(HashID.byteToHex(HashID.computeHashID("hello"))+"\n");
 	}
 }

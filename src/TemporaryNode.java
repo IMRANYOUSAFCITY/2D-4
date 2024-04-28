@@ -177,6 +177,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
         String closestNode = null;
         long closestDistance = Long.MAX_VALUE;
         String[] nodes = nearest(key);
+        end();
         for (int i = 0; i < nodes.length; i += 2) {
             String nodeName = nodes[i];
             String nodeAddress = nodes[i + 1];

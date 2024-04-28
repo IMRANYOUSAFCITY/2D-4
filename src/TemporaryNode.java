@@ -172,11 +172,11 @@ public class TemporaryNode implements TemporaryNodeInterface {
             return null;
         }
     }
-    public String findClosestNode(String key, String[] nodes) throws Exception {
+    public String findClosestNode(String key) throws Exception {
         String keyHashID = HashID.byteToHex(HashID.computeHashID(key));
         String closestNode = null;
         long closestDistance = Long.MAX_VALUE;
-
+        String[] nodes = nearest(key);
         for (int i = 0; i < nodes.length; i += 2) {
             String nodeName = nodes[i];
             String nodeAddress = nodes[i + 1];
@@ -203,13 +203,13 @@ public class TemporaryNode implements TemporaryNodeInterface {
         if(tn.start("imran:node-1","127.0.0.1:1234")){
             System.out.println("connected");
         }
-        //if(tn.store("hello there","does it work?")){
-        // System.out.println("it works");
-        // }
+        if(tn.store("hello there","does it work?")){
+         System.out.println("it works");
+         }
         //System.out.println(tn.getClosestNode("hello there"));
         //tn.get("test/jabberwocky/4" + "\n");
-        //tn.findClosestNode("hello",null);
-        tn.nearest("hello hello");
+        //tn.findClosestNode("hello");
+        //tn.nearest("hello hello");
         tn.end();
     }
 }

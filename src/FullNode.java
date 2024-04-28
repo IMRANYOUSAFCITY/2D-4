@@ -57,8 +57,7 @@ public class FullNode implements FullNodeInterface {
     
     public void handleIncomingConnections(String startingNodeName, String startingNodeAddress) { // first point of contact in network
         try {
-            String randomName = String.valueOf(System.currentTimeMillis());
-            addNode(randomName,String.join(":",ip,String.valueOf(port)));
+            addNode(startingNodeName,String.join(":",ip,String.valueOf(port)));
             startingName = startingNodeName;
             startingAddress = startingNodeAddress;
             if(!start){
@@ -173,7 +172,7 @@ public class FullNode implements FullNodeInterface {
                 keys[x] = recieve.readLine();
             }
             String key = String.join(" ",keys);
-            if(!(nearest("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key+"\n"))).contains(startingName + " " + startingAddress))){
+            if(!(nearest("NEAREST? " + HashID.byteToHex(HashID.computeHashID(key))).contains(startingName + " " + startingAddress))){
                 send.write("FAILED" + "\n");
                 send.flush();
             }else {
